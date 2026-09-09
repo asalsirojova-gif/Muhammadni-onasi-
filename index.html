@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#7c3aed">
+  <title>Bolajonlar — O‘ynab o‘rganamiz!</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="brand" data-view="home" aria-label="Bosh sahifa">
+      <img src="assets/icons/logo.png" alt="Bolajonlar logo" onerror="this.style.display='none'">
+      <span>Bolajonlar</span>
+    </button>
+    <nav>
+      <button data-view="home">Bosh sahifa</button>
+      <button data-view="lessons">Darslar</button>
+      <button data-view="quiz">Quiz</button>
+      <button data-view="ranking">Reyting</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="view active">
+      <div class="hero">
+        <div>
+          <p class="eyebrow">Kichkintoylar uchun ta'lim</p>
+          <h1>O‘ynab o‘rganamiz!</h1>
+          <p>Rasmlar orqali harflar, sonlar, ranglar va yana ko‘plab mavzularni o‘rganing.</p>
+          <button class="primary" data-view="lessons">Darslarni boshlash</button>
+        </div>
+        <img class="hero-logo" src="assets/icons/logo.png" alt="">
+      </div>
+      <h2>Mavzuni tanlang</h2>
+      <div id="categoryGrid" class="category-grid"></div>
+    </section>
+
+    <section id="lessons" class="view">
+      <div class="section-head">
+        <div><p class="eyebrow">Darslar</p><h1>O‘rganish markazi</h1></div>
+        <button class="secondary" data-view="home">← Orqaga</button>
+      </div>
+      <div id="lessonCategories" class="category-grid"></div>
+      <div id="lessonPanel"></div>
+    </section>
+
+    <section id="quiz" class="view">
+      <div class="section-head"><div><p class="eyebrow">Bilimingizni sinang</p><h1>Quiz</h1></div></div>
+      <div class="quiz-card">
+        <p id="quizQuestion">Quizni boshlash uchun tugmani bosing.</p>
+        <div id="quizOptions" class="quiz-options"></div>
+        <button id="startQuiz" class="primary">Quizni boshlash</button>
+        <p id="quizResult" class="result"></p>
+      </div>
+    </section>
+
+    <section id="ranking" class="view">
+      <div class="section-head"><div><p class="eyebrow">Sizning natijangiz</p><h1>Reyting</h1></div></div>
+      <div class="ranking-card">
+        <img src="assets/icons/reyting.png" alt="">
+        <h2>Yig‘ilgan ball</h2>
+        <strong id="score">0</strong>
+        <p>Quiz savollariga to‘g‘ri javob berib, ball to‘plang!</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>Bolajonlar • O‘ynab o‘rganamiz!</footer>
+  <script src="script.js"></script>
+</body>
+</html>
