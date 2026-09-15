@@ -10,8 +10,8 @@ const L = {
   transport: ["avtobus.jpg","avtomobil.jpg","havoshari.jpg","kema.jpg","mototsikl.jpg","politsiyamashinasi.jpg","poyezd.jpg","samalyot.jpg","samasval.jpg","tezyordam.jpg","traktor.jpg","velosiped.jpg","vertalyot.jpg","yaxta.jpg","yonginmashinasi.jpg"],
   exercises: []
 };
-const N={letters:"Harflar",numbers:"Sonlar",colors:"Ranglar",fruits:"Mevalar",body:"Tana a'zolari",shapes:"Shakllar",nature:"Tabiat",time:"Vaqt",transport:"Transport",exercises:"Mashqlar"};
-const I={letters:"harflar.png",numbers:"sonlar.png",colors:"ranglar.png",fruits:"mevalar .png",body:"tana azolar.png",shapes:"shakllar.png",nature:"tabiat.png",time:"vaqt.png",transport:"transport.png",exercises:"../illustrations/exercises/exercise.png"};
+const N={letters:"Harflar",numbers:"Sonlar",colors:"Ranglar",fruits:"Mevalar",body:"Tana a'zolari",shapes:"Shakllar",nature:"Tabiat",time:"Vaqt",transport"};
+const I={letters:"harflar.png",numbers:"sonlar.png",colors:"ranglar.png",fruits:"mevalar .png",body:"tana azolar.png",shapes:"shakllar.png",nature:"tabiat.png",time:"vaqt.png",transport:"transport.png",exercises:"};
 const pretty={"a":"A","b":"B","ch":"Ch","d":"D","e":"E","f":"F","g":"G","g‘":"G‘","h":"H","i1":"I","j":"J","k":"K","l":"L","m":"M","n":"N","ng":"Ng","o":"O","o‘":"O‘","p":"P","q":"Q","r":"R","s":"S","sh":"Sh","t":"T","u":"U","v":"V","x":"X","y":"Y","z":"Z","apilsin":"Apelsin","Bosh":"Bosh","Burun":"Burun","Ko‘z":"Ko‘z","Og‘iz":"Og‘iz","Oyoq":"Oyoq","Qo‘l":"Qo‘l","Quloq":"Quloq","Ormon":"O'rmon","Oyva yulduzlar":"Oy va yulduzlar","tog‘":"Tog‘","yomgir":"Yomg‘ir","Bejrang ":"Bej rang","Kulrang":"Kulrang","to‘q sarie":"To‘q sariq","to‘qkok":"To‘q ko‘k","koralrang":"Koral rang","havoshari":"Havo shari","politsiyamashinasi":"Politsiya mashinasi","samalyot":"Samolyot","samasval":"Samosval","tezyordam":"Tez yordam","vertalyot":"Vertolyot","yonginmashinasi":"Yong‘in mashinasi","chizma soat":"Chizma soat","kun va tun":"Kun va tun","qum soat":"Qum soat"};
 const $=s=>document.querySelector(s);
 let cat=null, lessonIndex=0, items=[], qi=0, qs=0, dp=null;
@@ -29,25 +29,25 @@ function renderCats(){
     Object.keys(L).forEach(c=>{
       const b=document.createElement('button');
       b.className='cat '+c;
-
-      const imgPath = c==='exercises'
-        ? 'assets/illustrations/exercises/exercise.png'
-        : `assets/icons/${I[c]}`;
-
       b.innerHTML=`
-        <img src="${imgPath}" alt="${N[c]}">
+        <img src="assets/icons/${I[c]}" alt="${N[c]}">
         <b>${N[c]}</b>
         <small>${L[c].length} ta</small>
       `;
-
-      if(c==='exercises'){
-        b.onclick=()=>view('exercises');
-      }else{
-        b.onclick=()=>open(c);
-      }
-
+      b.onclick=()=>open(c);
       box.appendChild(b);
     });
+
+    // 10-chi bo‘lim — MASHQLAR
+    const b=document.createElement('button');
+    b.className='cat exercises';
+    b.innerHTML=`
+      <img src="assets/illustrations/exercises/exercise.png" alt="Mashqlar">
+      <b>Mashqlar</b>
+      <small>10 ta mashq</small>
+    `;
+    b.onclick=()=>view('exercises');
+    box.appendChild(b);
   }
 }
 function open(c){cat=c;lessonIndex=0;$('#menu').hidden=true;$('#lesson').hidden=false;$('#lt').textContent=N[c];renderLesson();view('lessons')}
