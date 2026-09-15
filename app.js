@@ -7,10 +7,11 @@ const L = {
   shapes: ["Doira.jpg","Kvadrat.jpg","Oval.jpg","To'rtburchak.jpg","Uchburchak.jpg","Yulduz.jpg"],
   nature: ["bulut.jpg","daraxt.jpg","daryo.jpg","dengiz.jpg","gul.jpg","kamalak.jpg","olov.jpg","Ormon.jpg","Oyva yulduzlar.jpg","o‘tloq.jpg","qor.jpg","quyosh.jpg","shamol.jpg","tog‘.jpg","yomgir.jpg"],
   time: ["chizma soat.jpg","kalendar.jpg","kun va tun.jpg","qum soat.jpg","sana.jpg","sekundomer.jpg","soat.jpg","soat1.jpg"],
-  transport: ["avtobus.jpg","avtomobil.jpg","havoshari.jpg","kema.jpg","mototsikl.jpg","politsiyamashinasi.jpg","poyezd.jpg","samalyot.jpg","samasval.jpg","tezyordam.jpg","traktor.jpg","velosiped.jpg","vertalyot.jpg","yaxta.jpg","yonginmashinasi.jpg"]
+  transport: ["avtobus.jpg","avtomobil.jpg","havoshari.jpg","kema.jpg","mototsikl.jpg","politsiyamashinasi.jpg","poyezd.jpg","samalyot.jpg","samasval.jpg","tezyordam.jpg","traktor.jpg","velosiped.jpg","vertalyot.jpg","yaxta.jpg","yonginmashinasi.jpg"],
+  exercises: []
 };
-const N={letters:"Harflar",numbers:"Sonlar",colors:"Ranglar",fruits:"Mevalar",body:"Tana a'zolari",shapes:"Shakllar",nature:"Tabiat",time:"Vaqt",transport:"Transport"};
-const I={letters:"harflar.png",numbers:"sonlar.png",colors:"ranglar.png",fruits:"mevalar .png",body:"tana azolar.png",shapes:"shakllar.png",nature:"tabiat.png",time:"vaqt.png",transport:"transport.png"};
+const N={letters:"Harflar",numbers:"Sonlar",colors:"Ranglar",fruits:"Mevalar",body:"Tana a'zolari",shapes:"Shakllar",nature:"Tabiat",time:"Vaqt",transport:"Transport",exercises:"Mashqlar"};
+const I={letters:"harflar.png",numbers:"sonlar.png",colors:"ranglar.png",fruits:"mevalar .png",body:"tana azolar.png",shapes:"shakllar.png",nature:"tabiat.png",time:"vaqt.png",transport:"transport.png",exercises:"../illustrations/exercises/exercise.png"};
 const pretty={"a":"A","b":"B","ch":"Ch","d":"D","e":"E","f":"F","g":"G","g‘":"G‘","h":"H","i1":"I","j":"J","k":"K","l":"L","m":"M","n":"N","ng":"Ng","o":"O","o‘":"O‘","p":"P","q":"Q","r":"R","s":"S","sh":"Sh","t":"T","u":"U","v":"V","x":"X","y":"Y","z":"Z","apilsin":"Apelsin","Bosh":"Bosh","Burun":"Burun","Ko‘z":"Ko‘z","Og‘iz":"Og‘iz","Oyoq":"Oyoq","Qo‘l":"Qo‘l","Quloq":"Quloq","Ormon":"O'rmon","Oyva yulduzlar":"Oy va yulduzlar","tog‘":"Tog‘","yomgir":"Yomg‘ir","Bejrang ":"Bej rang","Kulrang":"Kulrang","to‘q sarie":"To‘q sariq","to‘qkok":"To‘q ko‘k","koralrang":"Koral rang","havoshari":"Havo shari","politsiyamashinasi":"Politsiya mashinasi","samalyot":"Samolyot","samasval":"Samosval","tezyordam":"Tez yordam","vertalyot":"Vertolyot","yonginmashinasi":"Yong‘in mashinasi","chizma soat":"Chizma soat","kun va tun":"Kun va tun","qum soat":"Qum soat"};
 const $=s=>document.querySelector(s);
 let cat=null, lessonIndex=0, items=[], qi=0, qs=0, dp=null;
@@ -20,7 +21,35 @@ function speak(t){if(!('speechSynthesis' in window))return toast("Ovoz mavjud em
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');clearTimeout(x._t);x._t=setTimeout(()=>x.classList.remove('show'),2300)}
 function view(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));if(v==='ranking')rank();window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>view(b.dataset.v));
-function renderCats(){for(const id of ['homeCats','lessonCats']){const box=$('#'+id);box.innerHTML='';Object.keys(L).forEach(c=>{const b=document.createElement('button');b.className='cat '+c;b.innerHTML=`<img src="assets/icons/${I[c]}" alt="${N[c]}"><b>${N[c]}</b><small>${L[c].length} ta</small>`;b.onclick=()=>open(c);box.appendChild(b)})}}
+function renderCats(){
+  for(const id of ['homeCats','lessonCats']){
+    const box=$('#'+id);
+    box.innerHTML='';
+
+    Object.keys(L).forEach(c=>{
+      const b=document.createElement('button');
+      b.className='cat '+c;
+
+      const imgPath = c==='exercises'
+        ? 'assets/illustrations/exercises/exercise.png'
+        : `assets/icons/${I[c]}`;
+
+      b.innerHTML=`
+        <img src="${imgPath}" alt="${N[c]}">
+        <b>${N[c]}</b>
+        <small>${L[c].length} ta</small>
+      `;
+
+      if(c==='exercises'){
+        b.onclick=()=>view('exercises');
+      }else{
+        b.onclick=()=>open(c);
+      }
+
+      box.appendChild(b);
+    });
+  }
+}
 function open(c){cat=c;lessonIndex=0;$('#menu').hidden=true;$('#lesson').hidden=false;$('#lt').textContent=N[c];renderLesson();view('lessons')}
 function renderLesson(){if(!cat)return;const list=L[cat], f=list[lessonIndex], n=name(f);$('#lessonCount').textContent=`${N[cat].toUpperCase()} • ${lessonIndex+1} / ${list.length}`;$('#lessonProgressText').textContent=`${lessonIndex+1}-rasm / ${list.length}`;$('#lessonProgressBar').style.width=((lessonIndex+1)/list.length*100)+'%';$('#singleCard').innerHTML=`<img src="assets/illustrations/${cat}/${encodeURIComponent(f)}" alt="${n}"><h2>${n}</h2><p>🔊 Nomi: <b>${n}</b></p>`;$('#singleCard').onclick=()=>speak(n);$('#prev').disabled=lessonIndex===0;$('#next').disabled=lessonIndex===list.length-1;$('#listenOne').onclick=()=>speak(n)}
 $('#prev').onclick=()=>{if(lessonIndex>0){lessonIndex--;renderLesson()}};
