@@ -33,6 +33,54 @@ function startQuiz(){items=sh(all()).slice(0,10);qi=0;qs=0;$('#qstart').hidden=t
 $('#start').onclick=startQuiz;
 function q(){if(qi>=items.length)return end();const x=items[qi];$('#num').textContent=`Savol ${qi+1} / 10`;$('#score').textContent=qs+' ball';$('#bar').style.width=(qi/10*100)+'%';$('#qimg').src=`assets/illustrations/${x.c}/${encodeURIComponent(x.f)}`;$('#qimg').alt=x.n;$('#feed').textContent='';const opts=sh([x,...sh(all().filter(y=>y.n!==x.n)).slice(0,3)]),box=$('#opts');box.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.textContent=o.n;b.onclick=()=>ans(b,o.n===x.n,x.n);box.appendChild(b)})}
 function ans(b,ok,right){const bs=[...document.querySelectorAll('#opts button')];bs.forEach(x=>x.disabled=true);if(ok){b.classList.add('ok');qs++;$('#feed').textContent='🎉 To‘g‘ri! +1 ball'}else{b.classList.add('no');bs.find(x=>x.textContent===right)?.classList.add('ok');$('#feed').textContent='😊 To‘g‘ri javob: '+right}speak(ok?'To‘g‘ri':'To‘g‘ri javob '+right);$('#score').textContent=qs+' ball';setTimeout(()=>{qi++;q()},1100)}
+
+// ===== MASHQLAR + XP =====
+let exerciseItems=[], exerciseIndex=0, exerciseScore=0, exerciseLocked=false;
+function getXP(){return +(localStorage.getItem('bolajonXP')||0)}
+function addXP(n){const v=getXP()+n;localStorage.setItem('bolajonXP',v);updateExerciseXP();return v}
+function updateExerciseXP(){const v=getXP();const a=$('#exerciseXP'),b=$('#exerciseLiveXP');if(a)a.textContent=v;if(b)b.textContent='⭐ '+v+' XP'}
+function startExercises(){
+  exerciseItems=sh(all()).slice(0,10);
+  exerciseIndex=0; exerciseScore=0; exerciseLocked=false;
+  $('#exerciseStart').hidden=true; $('#exerciseEnd').hidden=true; $('#exerciseGame').hidden=false;
+  renderExercise(); updateExerciseXP();
+}
+function renderExercise(){
+  if(exerciseIndex>=exerciseItems.length)return finishExercises();
+  const x=exerciseItems[exerciseIndex];
+  exerciseLocked=false;
+  $('#exerciseNum').textContent=`Mashq ${exerciseIndex+1} / 10`;
+  $('#exerciseScore').textContent=`${exerciseScore} / 10`;
+  $('#exerciseBar').style.width=(exerciseIndex/10*100)+'%';
+  $('#exerciseLiveXP').textContent='⭐ '+getXP()+' XP';
+  $('#exerciseImg').src=`assets/illustrations/${x.c}/${encodeURIComponent(x.f)}`;
+  $('#exerciseImg').alt=x.n;
+  $('#exerciseQuestion').textContent='Rasmda nima bor?';
+  $('#exerciseFeed').textContent='';
+  const opts=sh([x,...sh(all().filter(y=>y.n!==x.n)).slice(0,3)]);
+  const box=$('#exerciseOptions'); box.innerHTML='';
+  opts.forEach(o=>{const b=document.createElement('button');b.textContent=o.n;b.onclick=()=>answerExercise(b,o.n===x.n,x.n);box.appendChild(b)});
+}
+function answerExercise(btn,ok,right){
+  if(exerciseLocked)return; exerciseLocked=true;
+  const bs=[...document.querySelectorAll('#exerciseOptions button')]; bs.forEach(b=>b.disabled=true);
+  if(ok){btn.classList.add('ok');exerciseScore++;addXP(10);$('#exerciseFeed').textContent='🎉 To‘g‘ri! +10 XP';speak('To‘g‘ri!')}
+  else{btn.classList.add('no');bs.find(b=>b.textContent===right)?.classList.add('ok');$('#exerciseFeed').textContent='😊 To‘g‘ri javob: '+right;speak('To‘g‘ri javob '+right)}
+  $('#exerciseScore').textContent=`${exerciseScore} / 10`;
+  setTimeout(()=>{exerciseIndex++;renderExercise()},900);
+}
+function finishExercises(){
+  $('#exerciseGame').hidden=true; $('#exerciseEnd').hidden=false;
+  $('#exerciseFinal').textContent=exerciseScore+' / 10';
+  $('#exerciseMessage').textContent=exerciseScore>=8?'🌟 Ajoyib! Siz juda yaxshi ishladingiz!':exerciseScore>=5?'👏 Juda yaxshi! Yana mashq qiling!':'💜 Harakat zo‘r! Yana bir bor urinib ko‘ring!';
+  // Mashqni to‘liq tugatish bonusi
+  addXP(20);
+  $('#exerciseMessage').textContent += '  Mashqni tugatganingiz uchun +20 XP!';
+  updateExerciseXP();
+}
+$('#exerciseStartBtn').onclick=startExercises;
+$('#exerciseAgain').onclick=startExercises;
+
 function prizeFor(s){if(s>=10)return {emoji:'🏆',name:'SUPER SOVRIN',text:'🏆 Oltin kubok va katta sovg‘a!'};if(s>=9)return {emoji:'🎁',name:'KATTA SOVG‘A',text:'🎁 Ajoyib sovg‘a sizniki!'};if(s>=8)return {emoji:'🚲',name:'VELOSIPED',text:'🚲 Chiroyli velosiped sovrini!'};if(s>=7)return {emoji:'🧸',name:'AYIQCHA',text:'🧸 Yumshoq ayiqcha sovrini!'};if(s>=6)return {emoji:'🎁',name:'SOVG‘A',text:'🎁 Siz sovg‘a yutdingiz!'};if(s>=5)return {emoji:'🚗',name:'MASHINA',text:'🚗 O‘yinchoq mashina sovrini!'};return {emoji:'🌟',name:'HARAKATNI DAVOM ETTIRING',text:'🌟 Yana o‘ynang va sovrin yuting!'}}
 function end(){const p=prizeFor(qs), old=+(localStorage.getItem('best')||0);localStorage.setItem('best',Math.max(old,qs));$('#qgame').hidden=true;$('#qend').hidden=false;$('#final').textContent=qs+' / 10';$('#prizeEmoji').textContent=p.emoji;$('#msg').textContent=qs>=7?'🌟 Ajoyib natija!':qs>=5?'👏 Juda yaxshi!':'💜 Yana urinib ko‘ring!';$('#prize').innerHTML=`<span>${p.emoji}</span><div><b>${p.name}</b><small>${p.text}</small></div>`;const nm=playerName();speak(`Quiz tugadi${nm?', '+nm:''}. Siz ${qs} ball oldingiz. ${p.name}`)}
 $('#again').onclick=startQuiz;$('#rank').onclick=()=>view('ranking');
@@ -44,4 +92,4 @@ function initName(){const n=playerName();if(n){$('#playerName').value=n;$('#hell
 function installApp(){if(dp){dp.prompt();dp.userChoice.then(()=>{dp=null;$('#install').hidden=true})}else toast("Brauzer menyusidan 'Ilovani o'rnatish' ni tanlang")}
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#install').hidden=false});$('#install').onclick=installApp;$('#installHome').onclick=installApp;
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
-renderCats();initName();rank();setTimeout(()=>$('#splash')?.classList.add('hide'),850);addEventListener('load',()=>setTimeout(()=>$('#splash')?.classList.add('hide'),300));
+renderCats();initName();rank();updateExerciseXP();setTimeout(()=>$('#splash')?.classList.add('hide'),850);addEventListener('load',()=>setTimeout(()=>$('#splash')?.classList.add('hide'),300));
