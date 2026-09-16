@@ -788,12 +788,11 @@ $("#rank").onclick = () =>
 ========================= */
 
 const rewards = [
-  ["5 ball","🚗","Mashina"],
-  ["6 ball","🎁","Sovg‘a"],
-  ["7 ball","🧸","Ayiqcha"],
-  ["8 ball","🚲","Velosiped"],
-  ["9 ball","🎁","Katta sovg‘a"],
-  ["10 ball","🏆","Oltin kubok"]
+  ["100 XP","🥉","Medal"],
+  ["250 XP","👑","Toj"],
+  ["500 XP","🏆","Kubok"],
+  ["750 XP","🎁","Sovg‘a"],
+  ["1000 XP","🌟","Maxsus mukofot"]
 ];
 
 
