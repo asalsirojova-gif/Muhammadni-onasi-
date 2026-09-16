@@ -7,118 +7,977 @@ const L = {
   shapes: ["Doira.jpg","Kvadrat.jpg","Oval.jpg","To'rtburchak.jpg","Uchburchak.jpg","Yulduz.jpg"],
   nature: ["bulut.jpg","daraxt.jpg","daryo.jpg","dengiz.jpg","gul.jpg","kamalak.jpg","olov.jpg","Ormon.jpg","Oyva yulduzlar.jpg","o‘tloq.jpg","qor.jpg","quyosh.jpg","shamol.jpg","tog‘.jpg","yomgir.jpg"],
   time: ["chizma soat.jpg","kalendar.jpg","kun va tun.jpg","qum soat.jpg","sana.jpg","sekundomer.jpg","soat.jpg","soat1.jpg"],
-  transport: ["avtobus.jpg","avtomobil.jpg","havoshari.jpg","kema.jpg","mototsikl.jpg","politsiyamashinasi.jpg","poyezd.jpg","samalyot.jpg","samasval.jpg","tezyordam.jpg","traktor.jpg","velosiped.jpg","vertalyot.jpg","yaxta.jpg","yonginmashinasi.jpg"],
-  exercises: []
+  transport: ["avtobus.jpg","avtomobil.jpg","havoshari.jpg","kema.jpg","mototsikl.jpg","politsiyamashinasi.jpg","poyezd.jpg","samalyot.jpg","samasval.jpg","tezyordam.jpg","traktor.jpg","velosiped.jpg","vertalyot.jpg","yaxta.jpg","yonginmashinasi.jpg"]
 };
-const N={letters:"Harflar",numbers:"Sonlar",colors:"Ranglar",fruits:"Mevalar",body:"Tana a'zolari",shapes:"Shakllar",nature:"Tabiat",time:"Vaqt",transport"};
-const I={letters:"harflar.png",numbers:"sonlar.png",colors:"ranglar.png",fruits:"mevalar .png",body:"tana azolar.png",shapes:"shakllar.png",nature:"tabiat.png",time:"vaqt.png",transport:"transport.png",exercises:"};
-const pretty={"a":"A","b":"B","ch":"Ch","d":"D","e":"E","f":"F","g":"G","g‘":"G‘","h":"H","i1":"I","j":"J","k":"K","l":"L","m":"M","n":"N","ng":"Ng","o":"O","o‘":"O‘","p":"P","q":"Q","r":"R","s":"S","sh":"Sh","t":"T","u":"U","v":"V","x":"X","y":"Y","z":"Z","apilsin":"Apelsin","Bosh":"Bosh","Burun":"Burun","Ko‘z":"Ko‘z","Og‘iz":"Og‘iz","Oyoq":"Oyoq","Qo‘l":"Qo‘l","Quloq":"Quloq","Ormon":"O'rmon","Oyva yulduzlar":"Oy va yulduzlar","tog‘":"Tog‘","yomgir":"Yomg‘ir","Bejrang ":"Bej rang","Kulrang":"Kulrang","to‘q sarie":"To‘q sariq","to‘qkok":"To‘q ko‘k","koralrang":"Koral rang","havoshari":"Havo shari","politsiyamashinasi":"Politsiya mashinasi","samalyot":"Samolyot","samasval":"Samosval","tezyordam":"Tez yordam","vertalyot":"Vertolyot","yonginmashinasi":"Yong‘in mashinasi","chizma soat":"Chizma soat","kun va tun":"Kun va tun","qum soat":"Qum soat"};
-const $=s=>document.querySelector(s);
-let cat=null, lessonIndex=0, items=[], qi=0, qs=0, dp=null;
-const playerName=()=>localStorage.getItem('bolajonName')||'';
-function name(f){let x=f.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').trim();return pretty[x]||x.charAt(0).toUpperCase()+x.slice(1)}
-function speak(t){if(!('speechSynthesis' in window))return toast("Ovoz mavjud emas");speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='uz-UZ';u.rate=.82;speechSynthesis.speak(u)}
-function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');clearTimeout(x._t);x._t=setTimeout(()=>x.classList.remove('show'),2300)}
-function view(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));if(v==='ranking')rank();window.scrollTo({top:0,behavior:'smooth'})}
-document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>view(b.dataset.v));
-function renderCats(){
-  for(const id of ['homeCats','lessonCats']){
-    const box=$('#'+id);
-    box.innerHTML='';
 
-    Object.keys(L).forEach(c=>{
-      const b=document.createElement('button');
-      b.className='cat '+c;
-      b.innerHTML=`
+const N = {
+  letters:"Harflar",
+  numbers:"Sonlar",
+  colors:"Ranglar",
+  fruits:"Mevalar",
+  body:"Tana a'zolari",
+  shapes:"Shakllar",
+  nature:"Tabiat",
+  time:"Vaqt",
+  transport:"Transport"
+};
+
+const I = {
+  letters:"harflar.png",
+  numbers:"sonlar.png",
+  colors:"ranglar.png",
+  fruits:"mevalar .png",
+  body:"tana azolar.png",
+  shapes:"shakllar.png",
+  nature:"tabiat.png",
+  time:"vaqt.png",
+  transport:"transport.png"
+};
+
+const pretty = {
+  "a":"A","b":"B","ch":"Ch","d":"D","e":"E","f":"F","g":"G",
+  "g‘":"G‘","h":"H","i1":"I","j":"J","k":"K","l":"L","m":"M",
+  "n":"N","ng":"Ng","o":"O","o‘":"O‘","p":"P","q":"Q","r":"R",
+  "s":"S","sh":"Sh","t":"T","u":"U","v":"V","x":"X","y":"Y","z":"Z",
+  "apilsin":"Apelsin",
+  "Bosh":"Bosh",
+  "Burun":"Burun",
+  "Ko‘z":"Ko‘z",
+  "Og‘iz":"Og‘iz",
+  "Oyoq":"Oyoq",
+  "Qo‘l":"Qo‘l",
+  "Quloq":"Quloq",
+  "Ormon":"O'rmon",
+  "Oyva yulduzlar":"Oy va yulduzlar",
+  "tog‘":"Tog‘",
+  "yomgir":"Yomg‘ir",
+  "Bejrang":"Bej rang",
+  "Kulrang":"Kulrang",
+  "to‘q sarie":"To‘q sariq",
+  "to‘qkok":"To‘q ko‘k",
+  "koralrang":"Koral rang",
+  "havoshari":"Havo shari",
+  "politsiyamashinasi":"Politsiya mashinasi",
+  "samalyot":"Samolyot",
+  "samasval":"Samosval",
+  "tezyordam":"Tez yordam",
+  "vertalyot":"Vertolyot",
+  "yonginmashinasi":"Yong‘in mashinasi",
+  "chizma soat":"Chizma soat",
+  "kun va tun":"Kun va tun",
+  "qum soat":"Qum soat"
+};
+
+const $ = s => document.querySelector(s);
+
+let cat = null;
+let lessonIndex = 0;
+let items = [];
+let qi = 0;
+let qs = 0;
+let dp = null;
+
+const playerName = () => localStorage.getItem("bolajonName") || "";
+
+function name(f){
+  if(!f) return "";
+  let x = f.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim();
+  return pretty[x] || x.charAt(0).toUpperCase() + x.slice(1);
+}
+
+function speak(t){
+  if(!("speechSynthesis" in window)){
+    toast("Ovoz mavjud emas");
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const u = new SpeechSynthesisUtterance(t);
+  u.lang = "uz-UZ";
+  u.rate = .82;
+
+  speechSynthesis.speak(u);
+}
+
+function toast(t){
+  const x = $("#toast");
+  if(!x) return;
+
+  x.textContent = t;
+  x.classList.add("show");
+
+  clearTimeout(x._t);
+
+  x._t = setTimeout(() => {
+    x.classList.remove("show");
+  },2300);
+}
+
+
+/* =========================
+   SAHIFALAR
+========================= */
+
+function view(v){
+  const target = document.getElementById(v);
+
+  if(!target){
+    console.warn("View topilmadi:",v);
+    return;
+  }
+
+  document.querySelectorAll(".view").forEach(x => {
+    x.classList.toggle("active",x.id === v);
+  });
+
+  if(v === "ranking"){
+    rank();
+  }
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+}
+
+
+/* =========================
+   ASOSIY MENYU
+========================= */
+
+document.querySelectorAll("[data-v]").forEach(b => {
+  b.addEventListener("click",() => {
+    view(b.dataset.v);
+  });
+});
+
+
+/* =========================
+   MAVZU KARTALARI
+========================= */
+
+function renderCats(){
+
+  for(const id of ["homeCats","lessonCats"]){
+
+    const box = $("#"+id);
+
+    if(!box) continue;
+
+    box.innerHTML = "";
+
+    Object.keys(L).forEach(c => {
+
+      const b = document.createElement("button");
+
+      b.className = "cat " + c;
+
+      b.innerHTML = `
         <img src="assets/icons/${I[c]}" alt="${N[c]}">
         <b>${N[c]}</b>
         <small>${L[c].length} ta</small>
       `;
-      b.onclick=()=>open(c);
+
+      b.addEventListener("click",() => open(c));
+
       box.appendChild(b);
     });
 
-    // 10-chi bo‘lim — MASHQLAR
-    const b=document.createElement('button');
-    b.className='cat exercises';
-    b.innerHTML=`
+
+    /* =========================
+       10-KARTA — MASHQLAR
+    ========================= */
+
+    const exerciseCard = document.createElement("button");
+
+    exerciseCard.className = "cat exercises";
+
+    exerciseCard.innerHTML = `
       <img src="assets/illustrations/exercises/exercise.png" alt="Mashqlar">
       <b>Mashqlar</b>
       <small>10 ta mashq</small>
     `;
-    b.onclick=()=>view('exercises');
-    box.appendChild(b);
+
+    exerciseCard.addEventListener("click",() => {
+      view("exercises");
+    });
+
+    box.appendChild(exerciseCard);
   }
 }
-function open(c){cat=c;lessonIndex=0;$('#menu').hidden=true;$('#lesson').hidden=false;$('#lt').textContent=N[c];renderLesson();view('lessons')}
-function renderLesson(){if(!cat)return;const list=L[cat], f=list[lessonIndex], n=name(f);$('#lessonCount').textContent=`${N[cat].toUpperCase()} • ${lessonIndex+1} / ${list.length}`;$('#lessonProgressText').textContent=`${lessonIndex+1}-rasm / ${list.length}`;$('#lessonProgressBar').style.width=((lessonIndex+1)/list.length*100)+'%';$('#singleCard').innerHTML=`<img src="assets/illustrations/${cat}/${encodeURIComponent(f)}" alt="${n}"><h2>${n}</h2><p>🔊 Nomi: <b>${n}</b></p>`;$('#singleCard').onclick=()=>speak(n);$('#prev').disabled=lessonIndex===0;$('#next').disabled=lessonIndex===list.length-1;$('#listenOne').onclick=()=>speak(n)}
-$('#prev').onclick=()=>{if(lessonIndex>0){lessonIndex--;renderLesson()}};
-$('#next').onclick=()=>{if(cat&&lessonIndex<L[cat].length-1){lessonIndex++;renderLesson()}};
-$('#back').onclick=()=>{$('#lesson').hidden=true;$('#menu').hidden=false;window.scrollTo({top:0,behavior:'smooth'})};
-$('#allSpeak').onclick=()=>cat&&speak(L[cat].map(name).join('. '));
-const all=()=>Object.entries(L).flatMap(([c,fs])=>fs.map(f=>({c,f,n:name(f)})));
-const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-function startQuiz(){items=sh(all()).slice(0,10);qi=0;qs=0;$('#qstart').hidden=true;$('#qend').hidden=true;$('#qgame').hidden=false;q()}
-$('#start').onclick=startQuiz;
-function q(){if(qi>=items.length)return end();const x=items[qi];$('#num').textContent=`Savol ${qi+1} / 10`;$('#score').textContent=qs+' ball';$('#bar').style.width=(qi/10*100)+'%';$('#qimg').src=`assets/illustrations/${x.c}/${encodeURIComponent(x.f)}`;$('#qimg').alt=x.n;$('#feed').textContent='';const opts=sh([x,...sh(all().filter(y=>y.n!==x.n)).slice(0,3)]),box=$('#opts');box.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.textContent=o.n;b.onclick=()=>ans(b,o.n===x.n,x.n);box.appendChild(b)})}
-function ans(b,ok,right){const bs=[...document.querySelectorAll('#opts button')];bs.forEach(x=>x.disabled=true);if(ok){b.classList.add('ok');qs++;$('#feed').textContent='🎉 To‘g‘ri! +1 ball'}else{b.classList.add('no');bs.find(x=>x.textContent===right)?.classList.add('ok');$('#feed').textContent='😊 To‘g‘ri javob: '+right}speak(ok?'To‘g‘ri':'To‘g‘ri javob '+right);$('#score').textContent=qs+' ball';setTimeout(()=>{qi++;q()},1100)}
 
-// ===== MASHQLAR + XP =====
-let exerciseItems=[], exerciseIndex=0, exerciseScore=0, exerciseLocked=false;
-function getXP(){return +(localStorage.getItem('bolajonXP')||0)}
-function addXP(n){const v=getXP()+n;localStorage.setItem('bolajonXP',v);updateExerciseXP();return v}
-function updateExerciseXP(){const v=getXP();const a=$('#exerciseXP'),b=$('#exerciseLiveXP');if(a)a.textContent=v;if(b)b.textContent='⭐ '+v+' XP'}
+
+/* =========================
+   DARSLAR
+========================= */
+
+function open(c){
+
+  if(!L[c]){
+    console.warn("Noto‘g‘ri mavzu:",c);
+    return;
+  }
+
+  cat = c;
+  lessonIndex = 0;
+
+  const menu = $("#menu");
+  const lesson = $("#lesson");
+
+  if(menu) menu.hidden = true;
+  if(lesson) lesson.hidden = false;
+
+  if($("#lt")){
+    $("#lt").textContent = N[c];
+  }
+
+  renderLesson();
+
+  view("lessons");
+}
+
+
+function renderLesson(){
+
+  if(!cat || !L[cat] || !L[cat].length){
+    return;
+  }
+
+  const list = L[cat];
+
+  if(lessonIndex < 0) lessonIndex = 0;
+  if(lessonIndex >= list.length) lessonIndex = list.length - 1;
+
+  const f = list[lessonIndex];
+  const n = name(f);
+
+  $("#lessonCount").textContent =
+    `${N[cat].toUpperCase()} • ${lessonIndex+1} / ${list.length}`;
+
+  $("#lessonProgressText").textContent =
+    `${lessonIndex+1}-rasm / ${list.length}`;
+
+  $("#lessonProgressBar").style.width =
+    ((lessonIndex+1)/list.length*100)+"%";
+
+  $("#singleCard").innerHTML = `
+    <img
+      src="assets/illustrations/${cat}/${encodeURIComponent(f)}"
+      alt="${n}"
+    >
+    <h2>${n}</h2>
+    <p>🔊 Nomi: <b>${n}</b></p>
+  `;
+
+  $("#singleCard").onclick = () => speak(n);
+
+  $("#prev").disabled = lessonIndex === 0;
+
+  $("#next").disabled = lessonIndex === list.length - 1;
+
+  $("#listenOne").onclick = () => speak(n);
+}
+
+
+$("#prev").onclick = () => {
+
+  if(lessonIndex > 0){
+
+    lessonIndex--;
+
+    renderLesson();
+  }
+};
+
+
+$("#next").onclick = () => {
+
+  if(cat && L[cat] && lessonIndex < L[cat].length - 1){
+
+    lessonIndex++;
+
+    renderLesson();
+  }
+};
+
+
+$("#back").onclick = () => {
+
+  $("#lesson").hidden = true;
+  $("#menu").hidden = false;
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+};
+
+
+$("#allSpeak").onclick = () => {
+
+  if(cat && L[cat]){
+    speak(L[cat].map(name).join(". "));
+  }
+};
+
+
+/* =========================
+   BARCHA RASMLAR
+========================= */
+
+const all = () => {
+
+  return Object.entries(L).flatMap(([c,fs]) =>
+    fs.map(f => ({
+      c,
+      f,
+      n:name(f)
+    }))
+  );
+};
+
+
+const sh = a => {
+
+  a = [...a];
+
+  for(let i=a.length-1;i>0;i--){
+
+    const j = Math.floor(Math.random()*(i+1));
+
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+
+  return a;
+};
+
+
+/* =========================
+   QUIZ
+========================= */
+
+function startQuiz(){
+
+  items = sh(all()).slice(0,10);
+
+  qi = 0;
+  qs = 0;
+
+  $("#qstart").hidden = true;
+  $("#qend").hidden = true;
+  $("#qgame").hidden = false;
+
+  q();
+}
+
+
+$("#start").onclick = startQuiz;
+
+
+function q(){
+
+  if(qi >= items.length){
+    return end();
+  }
+
+  const x = items[qi];
+
+  $("#num").textContent =
+    `Savol ${qi+1} / 10`;
+
+  $("#score").textContent =
+    qs + " ball";
+
+  $("#bar").style.width =
+    (qi/10*100) + "%";
+
+  $("#qimg").src =
+    `assets/illustrations/${x.c}/${encodeURIComponent(x.f)}`;
+
+  $("#qimg").alt = x.n;
+
+  $("#feed").textContent = "";
+
+  const opts = sh([
+    x,
+    ...sh(all().filter(y => y.n !== x.n)).slice(0,3)
+  ]);
+
+  const box = $("#opts");
+
+  box.innerHTML = "";
+
+  opts.forEach(o => {
+
+    const b = document.createElement("button");
+
+    b.textContent = o.n;
+
+    b.onclick = () =>
+      ans(b,o.n === x.n,x.n);
+
+    box.appendChild(b);
+  });
+}
+
+
+function ans(b,ok,right){
+
+  const bs = [
+    ...document.querySelectorAll("#opts button")
+  ];
+
+  bs.forEach(x => x.disabled = true);
+
+  if(ok){
+
+    b.classList.add("ok");
+
+    qs++;
+
+    $("#feed").textContent =
+      "🎉 To‘g‘ri! +1 ball";
+
+  }else{
+
+    b.classList.add("no");
+
+    bs.find(x => x.textContent === right)
+      ?.classList.add("ok");
+
+    $("#feed").textContent =
+      "😊 To‘g‘ri javob: " + right;
+  }
+
+  speak(ok ? "To‘g‘ri" : "To‘g‘ri javob " + right);
+
+  $("#score").textContent =
+    qs + " ball";
+
+  setTimeout(() => {
+
+    qi++;
+
+    q();
+
+  },1100);
+}
+
+
+/* =========================
+   MASHQLAR + XP
+========================= */
+
+let exerciseItems = [];
+let exerciseIndex = 0;
+let exerciseScore = 0;
+let exerciseLocked = false;
+
+
+function getXP(){
+
+  return +(localStorage.getItem("bolajonXP") || 0);
+}
+
+
+function addXP(n){
+
+  const v = getXP() + n;
+
+  localStorage.setItem("bolajonXP",v);
+
+  updateExerciseXP();
+
+  return v;
+}
+
+
+function updateExerciseXP(){
+
+  const v = getXP();
+
+  const a = $("#exerciseXP");
+  const b = $("#exerciseLiveXP");
+
+  if(a) a.textContent = v;
+
+  if(b) b.textContent = "⭐ " + v + " XP";
+}
+
+
 function startExercises(){
-  exerciseItems=sh(all()).slice(0,10);
-  exerciseIndex=0; exerciseScore=0; exerciseLocked=false;
-  $('#exerciseStart').hidden=true; $('#exerciseEnd').hidden=true; $('#exerciseGame').hidden=false;
-  renderExercise(); updateExerciseXP();
-}
-function renderExercise(){
-  if(exerciseIndex>=exerciseItems.length)return finishExercises();
-  const x=exerciseItems[exerciseIndex];
-  exerciseLocked=false;
-  $('#exerciseNum').textContent=`Mashq ${exerciseIndex+1} / 10`;
-  $('#exerciseScore').textContent=`${exerciseScore} / 10`;
-  $('#exerciseBar').style.width=(exerciseIndex/10*100)+'%';
-  $('#exerciseLiveXP').textContent='⭐ '+getXP()+' XP';
-  $('#exerciseImg').src=`assets/illustrations/${x.c}/${encodeURIComponent(x.f)}`;
-  $('#exerciseImg').alt=x.n;
-  $('#exerciseQuestion').textContent='Rasmda nima bor?';
-  $('#exerciseFeed').textContent='';
-  const opts=sh([x,...sh(all().filter(y=>y.n!==x.n)).slice(0,3)]);
-  const box=$('#exerciseOptions'); box.innerHTML='';
-  opts.forEach(o=>{const b=document.createElement('button');b.textContent=o.n;b.onclick=()=>answerExercise(b,o.n===x.n,x.n);box.appendChild(b)});
-}
-function answerExercise(btn,ok,right){
-  if(exerciseLocked)return; exerciseLocked=true;
-  const bs=[...document.querySelectorAll('#exerciseOptions button')]; bs.forEach(b=>b.disabled=true);
-  if(ok){btn.classList.add('ok');exerciseScore++;addXP(10);$('#exerciseFeed').textContent='🎉 To‘g‘ri! +10 XP';speak('To‘g‘ri!')}
-  else{btn.classList.add('no');bs.find(b=>b.textContent===right)?.classList.add('ok');$('#exerciseFeed').textContent='😊 To‘g‘ri javob: '+right;speak('To‘g‘ri javob '+right)}
-  $('#exerciseScore').textContent=`${exerciseScore} / 10`;
-  setTimeout(()=>{exerciseIndex++;renderExercise()},900);
-}
-function finishExercises(){
-  $('#exerciseGame').hidden=true; $('#exerciseEnd').hidden=false;
-  $('#exerciseFinal').textContent=exerciseScore+' / 10';
-  $('#exerciseMessage').textContent=exerciseScore>=8?'🌟 Ajoyib! Siz juda yaxshi ishladingiz!':exerciseScore>=5?'👏 Juda yaxshi! Yana mashq qiling!':'💜 Harakat zo‘r! Yana bir bor urinib ko‘ring!';
-  // Mashqni to‘liq tugatish bonusi
-  addXP(20);
-  $('#exerciseMessage').textContent += '  Mashqni tugatganingiz uchun +20 XP!';
+
+  exerciseItems = sh(all()).slice(0,10);
+
+  exerciseIndex = 0;
+  exerciseScore = 0;
+  exerciseLocked = false;
+
+  $("#exerciseStart").hidden = true;
+  $("#exerciseEnd").hidden = true;
+  $("#exerciseGame").hidden = false;
+
+  renderExercise();
   updateExerciseXP();
 }
-$('#exerciseStartBtn').onclick=startExercises;
-$('#exerciseAgain').onclick=startExercises;
 
-function prizeFor(s){if(s>=10)return {emoji:'🏆',name:'SUPER SOVRIN',text:'🏆 Oltin kubok va katta sovg‘a!'};if(s>=9)return {emoji:'🎁',name:'KATTA SOVG‘A',text:'🎁 Ajoyib sovg‘a sizniki!'};if(s>=8)return {emoji:'🚲',name:'VELOSIPED',text:'🚲 Chiroyli velosiped sovrini!'};if(s>=7)return {emoji:'🧸',name:'AYIQCHA',text:'🧸 Yumshoq ayiqcha sovrini!'};if(s>=6)return {emoji:'🎁',name:'SOVG‘A',text:'🎁 Siz sovg‘a yutdingiz!'};if(s>=5)return {emoji:'🚗',name:'MASHINA',text:'🚗 O‘yinchoq mashina sovrini!'};return {emoji:'🌟',name:'HARAKATNI DAVOM ETTIRING',text:'🌟 Yana o‘ynang va sovrin yuting!'}}
-function end(){const p=prizeFor(qs), old=+(localStorage.getItem('best')||0);localStorage.setItem('best',Math.max(old,qs));$('#qgame').hidden=true;$('#qend').hidden=false;$('#final').textContent=qs+' / 10';$('#prizeEmoji').textContent=p.emoji;$('#msg').textContent=qs>=7?'🌟 Ajoyib natija!':qs>=5?'👏 Juda yaxshi!':'💜 Yana urinib ko‘ring!';$('#prize').innerHTML=`<span>${p.emoji}</span><div><b>${p.name}</b><small>${p.text}</small></div>`;const nm=playerName();speak(`Quiz tugadi${nm?', '+nm:''}. Siz ${qs} ball oldingiz. ${p.name}`)}
-$('#again').onclick=startQuiz;$('#rank').onclick=()=>view('ranking');
-const rewards=[['5 ball','🚗','Mashina'],['6 ball','🎁','Sovg‘a'],['7 ball','🧸','Ayiqcha'],['8 ball','🚲','Velosiped'],['9 ball','🎁','Katta sovg‘a'],['10 ball','🏆','Oltin kubok']];
-function rank(){const s=+(localStorage.getItem('best')||0),nm=playerName();$('#best').textContent=s;$('#rankName').textContent=nm?`👑 ${nm}`:'👑 Bolajon';const p=prizeFor(s);$('#rt').innerHTML=s>=5?`<div class="current-prize">${p.emoji}<div><b>${p.name}</b><small>${p.text}</small></div></div>`:'Quizni ishlab birinchi sovriningizni oling!';$('#rewardGrid').innerHTML=rewards.map(([score,e,t])=>`<div class="reward ${s>=+score.split(' ')[0]?'won':''}"><b>${score}</b><span>${e}</span><small>${t}</small></div>`).join('')}
-function saveName(){const v=$('#playerName').value.trim();if(!v)return toast('Avval ismingizni yozing 😊');localStorage.setItem('bolajonName',v);$('#hello').textContent=`Salom, ${v}! O'ynab o'rganamiz! 🌟`;$('#quizWelcome').textContent=`${v}, 10 ta savolga javob bering va sovrinlarni yutib oling!`;toast('Ismingiz saqlandi! 💜')}
-$('#saveName').onclick=saveName;
-function initName(){const n=playerName();if(n){$('#playerName').value=n;$('#hello').textContent=`Salom, ${n}! O'ynab o'rganamiz! 🌟`;$('#quizWelcome').textContent=`${n}, 10 ta savolga javob bering va sovrinlarni yutib oling!`}}
-function installApp(){if(dp){dp.prompt();dp.userChoice.then(()=>{dp=null;$('#install').hidden=true})}else toast("Brauzer menyusidan 'Ilovani o'rnatish' ni tanlang")}
-addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#install').hidden=false});$('#install').onclick=installApp;$('#installHome').onclick=installApp;
-if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
-renderCats();initName();rank();updateExerciseXP();setTimeout(()=>$('#splash')?.classList.add('hide'),850);addEventListener('load',()=>setTimeout(()=>$('#splash')?.classList.add('hide'),300));
+
+function renderExercise(){
+
+  if(exerciseIndex >= exerciseItems.length){
+    return finishExercises();
+  }
+
+  const x = exerciseItems[exerciseIndex];
+
+  exerciseLocked = false;
+
+  $("#exerciseNum").textContent =
+    `Mashq ${exerciseIndex+1} / 10`;
+
+  $("#exerciseScore").textContent =
+    `${exerciseScore} / 10`;
+
+  $("#exerciseBar").style.width =
+    (exerciseIndex/10*100)+"%";
+
+  $("#exerciseLiveXP").textContent =
+    "⭐ " + getXP() + " XP";
+
+  $("#exerciseImg").src =
+    `assets/illustrations/${x.c}/${encodeURIComponent(x.f)}`;
+
+  $("#exerciseImg").alt = x.n;
+
+  $("#exerciseQuestion").textContent =
+    "Rasmda nima bor?";
+
+  $("#exerciseFeed").textContent = "";
+
+  const opts = sh([
+    x,
+    ...sh(all().filter(y => y.n !== x.n)).slice(0,3)
+  ]);
+
+  const box = $("#exerciseOptions");
+
+  box.innerHTML = "";
+
+  opts.forEach(o => {
+
+    const b = document.createElement("button");
+
+    b.textContent = o.n;
+
+    b.onclick = () =>
+      answerExercise(
+        b,
+        o.n === x.n,
+        x.n
+      );
+
+    box.appendChild(b);
+  });
+}
+
+
+function answerExercise(btn,ok,right){
+
+  if(exerciseLocked) return;
+
+  exerciseLocked = true;
+
+  const bs = [
+    ...document.querySelectorAll("#exerciseOptions button")
+  ];
+
+  bs.forEach(b => b.disabled = true);
+
+  if(ok){
+
+    btn.classList.add("ok");
+
+    exerciseScore++;
+
+    addXP(10);
+
+    $("#exerciseFeed").textContent =
+      "🎉 To‘g‘ri! +10 XP";
+
+    speak("To‘g‘ri!");
+
+  }else{
+
+    btn.classList.add("no");
+
+    bs.find(b => b.textContent === right)
+      ?.classList.add("ok");
+
+    $("#exerciseFeed").textContent =
+      "😊 To‘g‘ri javob: " + right;
+
+    speak("To‘g‘ri javob " + right);
+  }
+
+  $("#exerciseScore").textContent =
+    `${exerciseScore} / 10`;
+
+  setTimeout(() => {
+
+    exerciseIndex++;
+
+    renderExercise();
+
+  },900);
+}
+
+
+function finishExercises(){
+
+  $("#exerciseGame").hidden = true;
+  $("#exerciseEnd").hidden = false;
+
+  $("#exerciseFinal").textContent =
+    exerciseScore + " / 10";
+
+  $("#exerciseMessage").textContent =
+    exerciseScore >= 8
+      ? "🌟 Ajoyib! Siz juda yaxshi ishladingiz!"
+      : exerciseScore >= 5
+        ? "👏 Juda yaxshi! Yana mashq qiling!"
+        : "💜 Harakat zo‘r! Yana bir bor urinib ko‘ring!";
+
+  addXP(20);
+
+  $("#exerciseMessage").textContent +=
+    " Mashqni tugatganingiz uchun +20 XP!";
+
+  updateExerciseXP();
+}
+
+
+$("#exerciseStartBtn").onclick =
+  startExercises;
+
+$("#exerciseAgain").onclick =
+  startExercises;
+
+
+/* =========================
+   MASHQLARDAN ORQAGA
+========================= */
+
+function backFromExercises(){
+
+  $("#exerciseStart").hidden = false;
+  $("#exerciseGame").hidden = true;
+  $("#exerciseEnd").hidden = true;
+
+  view("home");
+}
+
+
+/* =========================
+   QUIZ SOVRINLARI
+========================= */
+
+function prizeFor(s){
+
+  if(s >= 10)
+    return {
+      emoji:"🏆",
+      name:"SUPER SOVRIN",
+      text:"🏆 Oltin kubok va katta sovg‘a!"
+    };
+
+  if(s >= 9)
+    return {
+      emoji:"🎁",
+      name:"KATTA SOVG‘A",
+      text:"🎁 Ajoyib sovg‘a sizniki!"
+    };
+
+  if(s >= 8)
+    return {
+      emoji:"🚲",
+      name:"VELOSIPED",
+      text:"🚲 Chiroyli velosiped sovrini!"
+    };
+
+  if(s >= 7)
+    return {
+      emoji:"🧸",
+      name:"AYIQCHA",
+      text:"🧸 Yumshoq ayiqcha sovrini!"
+    };
+
+  if(s >= 6)
+    return {
+      emoji:"🎁",
+      name:"SOVG‘A",
+      text:"🎁 Siz sovg‘a yutdingiz!"
+    };
+
+  if(s >= 5)
+    return {
+      emoji:"🚗",
+      name:"MASHINA",
+      text:"🚗 O‘yinchoq mashina sovrini!"
+    };
+
+  return {
+    emoji:"🌟",
+    name:"HARAKATNI DAVOM ETTIRING",
+    text:"🌟 Yana o‘ynang va sovrin yuting!"
+  };
+}
+
+
+function end(){
+
+  const p = prizeFor(qs);
+
+  const old =
+    +(localStorage.getItem("best") || 0);
+
+  localStorage.setItem(
+    "best",
+    Math.max(old,qs)
+  );
+
+  $("#qgame").hidden = true;
+  $("#qend").hidden = false;
+
+  $("#final").textContent =
+    qs + " / 10";
+
+  $("#prizeEmoji").textContent =
+    p.emoji;
+
+  $("#msg").textContent =
+    qs >= 7
+      ? "🌟 Ajoyib natija!"
+      : qs >= 5
+        ? "👏 Juda yaxshi!"
+        : "💜 Yana urinib ko‘ring!";
+
+  $("#prize").innerHTML = `
+    <span>${p.emoji}</span>
+    <div>
+      <b>${p.name}</b>
+      <small>${p.text}</small>
+    </div>
+  `;
+
+  const nm = playerName();
+
+  speak(
+    `Quiz tugadi${nm ? ", " + nm : ""}. Siz ${qs} ball oldingiz. ${p.name}`
+  );
+}
+
+
+$("#again").onclick = startQuiz;
+
+$("#rank").onclick = () =>
+  view("ranking");
+
+
+/* =========================
+   REYTING
+========================= */
+
+const rewards = [
+  ["5 ball","🚗","Mashina"],
+  ["6 ball","🎁","Sovg‘a"],
+  ["7 ball","🧸","Ayiqcha"],
+  ["8 ball","🚲","Velosiped"],
+  ["9 ball","🎁","Katta sovg‘a"],
+  ["10 ball","🏆","Oltin kubok"]
+];
+
+
+function rank(){
+
+  const s =
+    +(localStorage.getItem("best") || 0);
+
+  const nm = playerName();
+
+  $("#best").textContent = s;
+
+  $("#rankName").textContent =
+    nm ? `👑 ${nm}` : "👑 Bolajon";
+
+  const p = prizeFor(s);
+
+  $("#rt").innerHTML =
+    s >= 5
+      ? `
+        <div class="current-prize">
+          ${p.emoji}
+          <div>
+            <b>${p.name}</b>
+            <small>${p.text}</small>
+          </div>
+        </div>
+      `
+      : "Quizni ishlab birinchi sovriningizni oling!";
+
+  $("#rewardGrid").innerHTML =
+    rewards.map(([score,e,t]) => `
+      <div class="reward ${s >= +score.split(" ")[0] ? "won" : ""}">
+        <b>${score}</b>
+        <span>${e}</span>
+        <small>${t}</small>
+      </div>
+    `).join("");
+}
+
+
+/* =========================
+   ISM
+========================= */
+
+function saveName(){
+
+  const v =
+    $("#playerName").value.trim();
+
+  if(!v){
+    return toast("Avval ismingizni yozing 😊");
+  }
+
+  localStorage.setItem(
+    "bolajonName",
+    v
+  );
+
+  $("#hello").textContent =
+    `Salom, ${v}! O'ynab o'rganamiz! 🌟`;
+
+  $("#quizWelcome").textContent =
+    `${v}, 10 ta savolga javob bering va sovrinlarni yutib oling!`;
+
+  toast("Ismingiz saqlandi! 💜");
+}
+
+
+$("#saveName").onclick =
+  saveName;
+
+
+function initName(){
+
+  const n = playerName();
+
+  if(n){
+
+    $("#playerName").value = n;
+
+    $("#hello").textContent =
+      `Salom, ${n}! O'ynab o'rganamiz! 🌟`;
+
+    $("#quizWelcome").textContent =
+      `${n}, 10 ta savolga javob bering va sovrinlarni yutib oling!`;
+  }
+}
+
+
+/* =========================
+   PWA O‘RNATISH
+========================= */
+
+function installApp(){
+
+  if(dp){
+
+    dp.prompt();
+
+    dp.userChoice.then(() => {
+
+      dp = null;
+
+      if($("#install")){
+        $("#install").hidden = true;
+      }
+
+    });
+
+  }else{
+
+    toast(
+      "Brauzer menyusidan 'Ilovani o'rnatish' ni tanlang"
+    );
+  }
+}
+
+
+addEventListener(
+  "beforeinstallprompt",
+  e => {
+
+    e.preventDefault();
+
+    dp = e;
+
+    if($("#install")){
+      $("#install").hidden = false;
+    }
+  }
+);
+
+
+$("#install").onclick =
+  installApp;
+
+$("#installHome").onclick =
+  installApp;
+
+
+/* =========================
+   SERVICE WORKER
+========================= */
+
+if("serviceWorker" in navigator){
+
+  addEventListener("load",() => {
+
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .catch(err => {
+        console.warn(
+          "Service Worker xatosi:",
+          err
+        );
+      });
+
+  });
+}
+
+
+/* =========================
+   BOSHLASH
+========================= */
+
+renderCats();
+initName();
+rank();
+updateExerciseXP();
+
+setTimeout(() => {
+
+  $("#splash")?.classList.add("hide");
+
+},850);
+
+addEventListener("load",() => {
+
+  setTimeout(() => {
+
+    $("#splash")?.classList.add("hide");
+
+  },300);
+
+});
