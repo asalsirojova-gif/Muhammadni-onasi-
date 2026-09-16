@@ -799,8 +799,10 @@ const rewards = [
 function rank(){
 
   const s =
-    +(localStorage.getItem("best") || 0);
+  +(localStorage.getItem("best") || 0);
 
+const xp =
+  +(localStorage.getItem("bolajonXP") || 0);
   const nm = playerName();
 
   $("#best").textContent = s;
@@ -823,14 +825,14 @@ function rank(){
       `
       : "Quizni ishlab birinchi sovriningizni oling!";
 
-  $("#rewardGrid").innerHTML =
-    rewards.map(([score,e,t]) => `
-      <div class="reward ${s >= +score.split(" ")[0] ? "won" : ""}">
-        <b>${score}</b>
-        <span>${e}</span>
-        <small>${t}</small>
-      </div>
-    `).join("");
+$("#rewardGrid").innerHTML =
+  rewards.map(([score,e,t]) => `
+    <div class="reward ${xp >= +score.split(" ")[0] ? "won" : ""}">
+      <b>${score}</b>
+      <span>${e}</span>
+      <small>${t}</small>
+    </div>
+  `).join("");
 }
 
 
