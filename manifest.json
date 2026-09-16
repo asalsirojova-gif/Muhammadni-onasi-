@@ -1,0 +1,18 @@
+{
+  "name": "Bolajonlar - O'ynab o'rganamiz!",
+  "short_name": "Bolajonlar",
+  "description": "Bolajonlar uchun rang-barang o'zbekcha ta'lim ilovasi",
+  "start_url": "./index.html",
+  "id": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#6d3df2",
+  "lang": "uz",
+  "icons": [
+    { "src": "assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
