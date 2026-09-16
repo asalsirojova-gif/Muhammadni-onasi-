@@ -1,4 +1,4 @@
-aconst L = {
+const L = {
   letters: ["a.jpg","b.jpg","d.jpg","e.jpg","f.jpg","g.jpg","h.jpg","i1.jpg","j.jpg","k.jpg","l.jpg","m.jpg","n.jpg","o.jpg","p.jpg","q.jpg","r.jpg","s.jpg","t.jpg","u.jpg","v.jpg","x.jpg","y.jpg","z.jpg","o‘.jpg","g‘.jpg","sh.jpg","ch.jpg","ng.jpg"],
   numbers: ["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg"],
   colors: ["Bejrang .jpg","binafsha.jpg","havorang.jpg","jigarrang.jpg","koralrang.jpg","ko‘k.jpg","Kulrang.jpg","kumushrang.jpg","oltinrang.jpg","oq.jpg","osmonrang.jpg","pushti.jpg","qizil.jpg","qora.jpg","sariq.jpg","to‘q sarie.jpg","to‘qkok.jpg","turkuazrang.jpg","yashil.jpg","zangori.jpg"],
