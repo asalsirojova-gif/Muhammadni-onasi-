@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#6d3df2">
+  <meta name="description" content="Bolajonlar uchun rang-barang o'zbekcha ta'lim ilovasi">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/pwa/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Bolajonlar</title>
+  <style>
+    .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:14px;margin:18px 0 28px}
+    .feature-card{border:0;border-radius:22px;padding:18px;text-align:left;background:#fff;box-shadow:0 8px 24px rgba(40,20,90,.10);cursor:pointer}
+    .feature-card .fi{font-size:34px;display:block;margin-bottom:8px}.feature-card b{display:block;font-size:16px}.feature-card small{display:block;margin-top:5px;opacity:.72}
+    .feature-view{padding-bottom:35px}.feature-head{display:flex;align-items:center;gap:14px;margin:8px 0 18px}.feature-head .big{font-size:42px}
+    .feature-head h1{margin:0}.feature-head p{margin:5px 0;opacity:.72}
+    .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
+    .stat-box{background:#fff;border-radius:20px;padding:16px;box-shadow:0 6px 18px rgba(40,20,90,.08)}
+    .stat-box strong{display:block;font-size:25px;margin-top:5px}.stat-box small{opacity:.7}
+    .xp-bar{height:14px;background:#eee6ff;border-radius:20px;overflow:hidden;margin:10px 0}.xp-bar b{display:block;height:100%;width:0;border-radius:20px;background:#6d3df2}
+    .reward-grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.reward2{background:#fff;border-radius:20px;padding:14px;text-align:center;box-shadow:0 6px 18px rgba(40,20,90,.08);opacity:.48}.reward2.won{opacity:1}.reward2 img{width:82px;height:82px;object-fit:contain;display:block;margin:auto}.reward2 b,.reward2 small{display:block}
+    .streak-box{background:#fff;border-radius:24px;padding:22px;text-align:center;box-shadow:0 8px 24px rgba(40,20,90,.1)}.streak-fire{font-size:58px}
+    .week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:18px}.day{padding:9px 3px;border-radius:12px;background:#f2eefb;font-size:12px}.day.on{background:#e7d9ff}.day b{display:block;font-size:18px}
+    .parent-list{display:grid;gap:10px}.parent-row{background:#fff;border-radius:18px;padding:14px;display:flex;justify-content:space-between;box-shadow:0 5px 16px rgba(40,20,90,.07)}
+    .ai-box{background:#fff;border-radius:24px;padding:20px;box-shadow:0 8px 24px rgba(40,20,90,.1)}.ai-message{padding:14px;border-radius:16px;background:#f4f0ff;margin:10px 0}.ai-input{display:flex;gap:8px}.ai-input input{flex:1;min-width:0}
+    .feature-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 24px}.feature-nav button{border:0;border-radius:15px;padding:10px 5px;background:#fff;box-shadow:0 4px 12px rgba(40,20,90,.08);font-size:12px;cursor:pointer}
+    @media(max-width:520px){.feature-grid{grid-template-columns:repeat(2,1fr)}.reward-grid2{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+<div id="splash" class="splash"><img src="assets/icons/logo.png" alt="Bolajonlar"><h1>Bolajonlar</h1><p>O'ynab o'rganamiz!</p></div>
+
+<header class="topbar">
+  <button class="brand" data-v="home"><img src="assets/icons/logo.png" alt="Bolajonlar"> <span>Bolajonlar</span></button>
+  <button id="install" class="install" hidden>📲 Telefonga o'rnatish</button>
+</header>
+
+<main>
+<section id="home" class="view active">
+  <div class="hero">
+    <div>
+      <p class="ey">KICHKINTOYLAR UCHUN TA'LIM</p>
+      <h1>O'ynab <em>o'rganamiz!</em></h1>
+      <p>Rasmlarni ko'ring, nomini eshiting va bilimlaringizni sinang.</p>
+      <div class="namebox">
+        <label for="playerName">👋 Ismingiz nima?</label>
+        <div><input id="playerName" maxlength="24" placeholder="Ismingizni yozing"><button id="saveName">Saqlash</button></div>
+        <small id="hello">Ismingizni yozing va o'yinni boshlang ✨</small>
+      </div>
+      <button class="primary" data-v="lessons">Darslarni boshlash ✨</button>
+    </div>
+    <img src="assets/icons/logo.png" alt="Bolajonlar logotipi">
+  </div>
+
+  <div class="quick-install">
+    <div><span>📱</span><div><b>Bolajonlarni telefonga o'rnating</b><small>Internet bo'lmasa ham qulay foydalaning</small></div></div>
+    <button id="installHome">O'rnatish</button>
+  </div>
+
+  <nav class="mainnav" aria-label="Asosiy menyu">
+    <button data-v="home">🏠 <span>Bosh sahifa</span></button>
+    <button data-v="lessons">📚 <span>Darslar</span></button>
+    <button data-v="exercises">🎮 <span>Mashqlar</span></button>
+    <button data-v="quiz">🧩 <span>Quiz</span></button>
+    <button data-v="ranking">🏆 <span>Reyting</span></button>
+  </nav>
+
+  <div class="section-title"><div><p class="ey">9 TA QIZIQARLI MAVZU</p><h2>Mavzuni tanlang</h2></div></div>
+  <div id="homeCats" class="grid"></div>
+
+  <div class="section-title"><div><p class="ey">BOLAJONLAR UCHUN</p><h2>Qo'shimcha imkoniyatlar</h2></div></div>
+  <div class="feature-grid">
+    <button class="feature-card" data-v="xp"><span class="fi">⭐</span><b>XP / Ball</b><small>Darajangiz va XP</small></button>
+    <button class="feature-card" data-v="rewards"><span class="fi">🏆</span><b>Mukofotlar</b><small>XP bilan ochiladi</small></button>
+    <button class="feature-card" data-v="streak"><span class="fi">🔥</span><b>Seriya</b><small>Ketma-ket kunlar</small></button>
+    <button class="feature-card" data-v="results"><span class="fi">📊</span><b>Natijalar</b><small>Rivojlanish statistikasi</small></button>
+    <button class="feature-card" data-v="parent"><span class="fi">👨‍👩‍👧</span><b>Ota-ona</b><small>Natijalarni ko'rish</small></button>
+    <button class="feature-card" data-v="ai"><span class="fi">🤖</span><b>Bolajon AI</b><small>Yordamchi</small></button>
+  </div>
+</section>
+
+<section id="lessons" class="view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div id="menu">
+    <div class="lesson-hero"><span>🌈</span><div><p class="ey">RANG-BARANG TA'LIM</p><h1>Darslar olami</h1><p>Har bir mavzuni ketma-ket, rasm va ovoz bilan o'rganing.</p></div></div>
+    <div id="lessonCats" class="grid lesson-grid"></div>
+  </div>
+  <div id="lesson" hidden>
+    <button id="back" class="back">← Barcha mavzular</button>
+    <div class="lesson-head"><div><p class="ey" id="lessonCount">MAVZU</p><h1 id="lt"></h1><p>Rasmga yoki <b>Eshitish</b> tugmasiga bosing 🔊</p></div><button id="allSpeak" class="soft">🔊 Hammasini eshitish</button></div>
+    <div class="lesson-progress"><span id="lessonProgressText"></span><i><b id="lessonProgressBar"></b></i></div>
+    <article id="singleCard" class="single-card"></article>
+    <div class="lesson-actions"><button id="prev" class="prev">← Oldingi</button><button id="listenOne" class="listen">🔊 Eshitish</button><button id="next" class="next">Keyingi →</button></div>
+  </div>
+</section>
+
+<section id="exercises" class="view">
+  <button class="back" onclick="backFromExercises()">← Bosh menyuga qaytish</button>
+  <div class="quiz-title exercise-title"><span>🎮</span><div><p class="ey">QIZIQARLI MASHQLAR</p><h1>Mashqlar olami!</h1><p>Rasmga qarang va to'g'ri javobni toping. Har bir to'g'ri javob uchun +10 XP.</p></div></div>
+  <div class="exercise-stats"><span>⭐ XP: <b id="exerciseXP">0</b></span><span>🎯 Natija: <b id="exerciseScore">0 / 10</b></span></div>
+  <div id="exerciseStart" class="panel quiz-start"><div>🧩</div><h2>Tayyormisiz?</h2><p>10 ta mashqni bajaring va bilimlaringizni mustahkamlang.</p><button id="exerciseStartBtn" class="primary">Mashqni boshlash</button></div>
+  <div id="exerciseGame" hidden><div class="progress"><span id="exerciseNum"></span><i><b id="exerciseBar"></b></i><strong id="exerciseLiveXP"></strong></div><div class="panel exercise-card"><p id="exerciseQuestion">Rasmda nima bor?</p><img id="exerciseImg" alt="Mashq rasmi"><div id="exerciseOptions" class="opts"></div><p id="exerciseFeed"></p></div></div>
+  <div id="exerciseEnd" class="panel prize-panel" hidden><div>🌟</div><h2>Mashq tugadi!</h2><strong id="exerciseFinal"></strong><p id="exerciseMessage"></p><button id="exerciseAgain" class="primary">Yana mashq qilish</button></div>
+</section>
+
+<section id="quiz" class="view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div class="quiz-title"><span>🧩</span><div><p class="ey">10 TA SAVOL</p><h1>Bilimingizni sinang!</h1><p>Har bir to'g'ri javob uchun 1 ball olasiz.</p></div></div>
+  <div id="qstart" class="panel quiz-start"><div>🎯</div><h2>Tayyormisiz?</h2><p id="quizWelcome">10 ta savolga javob bering va sovrinlarni yutib oling!</p><button id="start" class="primary">Boshlash</button></div>
+  <div id="qgame" hidden><div class="progress"><span id="num"></span><i><b id="bar"></b></i><strong id="score"></strong></div><div class="panel quiz-card"><p>Rasmda nima bor?</p><img id="qimg" alt="Quiz rasmi"><div id="opts" class="opts"></div><p id="feed"></p></div></div>
+  <div id="qend" class="panel prize-panel" hidden><div id="prizeEmoji">🏆</div><h2>Quiz tugadi!</h2><strong id="final"></strong><p id="msg"></p><div id="prize" class="prize"></div><button id="rank" class="primary">Reytingni ko'rish</button><button id="again" class="secondary">Qayta o'ynash</button></div>
+</section>
+
+<section id="ranking" class="view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div class="rank-wrap"><div class="panel rank"><div>🏆</div><p class="ey">SIZNING NATIJANGIZ</p><h1>Reyting</h1><p class="rank-name" id="rankName">Bolajon</p><strong id="best">0</strong><p>eng yaxshi Quiz ball</p><div id="rt"></div></div></div>
+</section>
+
+<section id="xp" class="view feature-view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div class="feature-head"><span class="big">⭐</span><div><p class="ey">RIVOJLANISH</p><h1>XP / Ball</h1><p>Har bir faoliyatdan to'plangan umumiy tajriba.</p></div></div>
+  <div class="stat-grid"><div class="stat-box">⭐ Umumiy XP<strong id="xpTotal">0</strong><small>tajriba ballari</small></div><div class="stat-box">🎯 Daraja<strong id="xpLevel">1-daraja</strong><small id="xpNext">Keyingi darajagacha</small></div></div>
+  <div class="panel"><b id="xpProgressText">0 / 100 XP</b><div class="xp-bar"><b id="xpProgressBar"></b></div></div>
+  <div class="panel"><h3>XP qanday olinadi?</h3><p>To'g'ri mashq: <b>+10 XP</b></p><p>Mashqni tugatish: <b>+20 XP</b></p><p>Kunlik topshiriq: <b>+30 XP</b></p><p>7 kunlik seriya: <b>+50 XP</b></p><p>Quizdagi har bir to'g'ri javob: <b>+5 XP</b></p></div>
+</section>
+
+<section id="rewards" class="view feature-view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div class="feature-head"><span class="big">🏆</span><div><p class="ey">SOVRINLAR</p><h1>Mukofotlar</h1><p>XP yig'ing va mukofotlarni oching.</p></div></div>
+  <div class="stat-box">⭐ Hozirgi XP<strong id="rewardXP">0</strong></div>
+  <div id="rewardGrid2" class="reward-grid2" style="margin-top:14px"></div>
+</section>
+
+<section id="streak" class="view feature-view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div class="feature-head"><span class="big">🔥</span><div><p class="ey">HAR KUNI</p><h1>Seriya</h1><p>Har kuni kamida bitta dars yoki mashq bajaring.</p></div></div>
+  <div class="streak-box"><div class="streak-fire">🔥</div><p>Joriy seriya</p><h1 id="streakCount">0 kun</h1><p id="streakMessage">Bugun boshlang!</p><div class="week" id="streakWeek"></div></div>
+  <div class="panel"><h3>7 kunlik bonus</h3><p>7 kun uzluksiz faol bo'lsangiz <b>+50 XP</b> beriladi.</p></div>
+</section>
+
+<section id="results" class="view feature-view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div class="feature-head"><span class="big">📊</span><div><p class="ey">RIVOJLANISH</p><h1>Natijalar</h1><p>O'qish va o'yinlardagi natijalar.</p></div></div>
+  <div class="stat-grid"><div class="stat-box">⭐ XP<strong id="resXP">0</strong></div><div class="stat-box">🎮 Mashqlar<strong id="resExercises">0</strong></div><div class="stat-box">🧩 Quiz savollari<strong id="resQuizQuestions">0</strong></div><div class="stat-box">🔥 Seriya<strong id="resStreak">0 kun</strong></div></div>
+  <div class="panel"><h3>Quiz natijasi</h3><p>Eng yaxshi natija: <b id="resBest">0 / 10</b></p><p>Quizlardan olingan XP: <b id="resQuizXP">0</b></p></div>
+</section>
+
+<section id="parent" class="view feature-view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div class="feature-head"><span class="big">👨‍👩‍👧</span><div><p class="ey">OILA UCHUN</p><h1>Ota-ona</h1><p>Bolaning rivojlanish ko'rsatkichlari.</p></div></div>
+  <div class="panel"><h2 id="parentName">Bolajon</h2><p>Quyidagi ma'lumotlar shu qurilmada saqlanadi.</p></div>
+  <div class="parent-list">
+    <div class="parent-row"><span>Umumiy XP</span><b id="parentXP">0</b></div>
+    <div class="parent-row"><span>Daraja</span><b id="parentLevel">1</b></div>
+    <div class="parent-row"><span>Eng yaxshi Quiz</span><b id="parentBest">0 / 10</b></div>
+    <div class="parent-row"><span>Bajarilgan mashqlar</span><b id="parentExercises">0</b></div>
+    <div class="parent-row"><span>Joriy seriya</span><b id="parentStreak">0 kun</b></div>
+  </div>
+</section>
+
+<section id="ai" class="view feature-view">
+  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
+  <div class="feature-head"><span class="big">🤖</span><div><p class="ey">YORDAMCHI</p><h1>Bolajon AI</h1><p>O'qishga yordam beruvchi aqlli yordamchi.</p></div></div>
+  <div class="ai-box">
+    <div class="ai-message"><b>🤖 Bolajon AI</b><br>Hozircha sinov rejimida ishlayman. Savolingizni yozing — men o'quvcha tarzda javob beraman.</div>
+    <div id="aiMessages"></div>
+    <div class="ai-input"><input id="aiInput" placeholder="Masalan: A harfi haqida ayt"><button id="aiSend" class="primary">Yuborish</button></div>
+  </div>
+</section>
+</main>
+
+<div id="toast" role="status"></div>
+<footer>💜 Bolajonlar • O'ynab o'rganamiz!</footer>
+<script src="app.js?v=7"></script>
+</body>
+</html>
