@@ -676,7 +676,6 @@ function backFromExercises(){
 
   view("home");
 }
-$("#backExercises").onclick = backFromExercises;
 
 /* =========================
    QUIZ SOVRINLARI
