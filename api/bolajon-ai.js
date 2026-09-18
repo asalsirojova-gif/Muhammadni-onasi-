@@ -17,15 +17,14 @@ export default async function handler(req, res) {
     const {
       action = "chat",
       message = "",
+      history = [],
       fileData = "",
       mimeType = ""
     } = req.body || {};
 
-    /*
-    ==================================================
-    BOLAJON AI — RASM YARATISH
-    ==================================================
-    */
+    /* =========================
+       1. RASM YARATISH
+    ========================= */
 
     if (action === "image") {
       if (!message.trim()) {
@@ -33,6 +32,30 @@ export default async function handler(req, res) {
           error: "Rasm uchun tavsif yozing"
         });
       }
+
+      const imagePrompt = `
+Sen Bolajon AI uchun rasm yaratuvchi yordamchisan.
+
+Rasm:
+- bolalar uchun mos;
+- quvnoq;
+- chiroyli;
+- ta'limiy;
+- xavfsiz;
+- toza va professional bo'lsin.
+
+Bolajonlar ilovasining uslubiga mos:
+- yumshoq ranglar;
+- premium bolalar ta'lim ilovasi ko'rinishi;
+- knitted / crochet / yarn texture;
+- yoqimli dekorativ elementlar.
+
+Odamlar, yuzlar, ko'zlar va hayvonlarni faqat foydalanuvchi aniq so'rasa ishlat.
+Qo'rqinchli yoki zo'ravon kontent yaratma.
+
+Foydalanuvchi so'rovi:
+${message}
+`;
 
       const response = await fetch(
         "https://generativelanguage.googleapis.com/v1beta/interactions",
@@ -44,19 +67,7 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             model: "gemini-3.1-flash-image",
-
-            input: [
-              {
-                type: "text",
-                text:
-                  "Create a beautiful, high-quality educational image for children. " +
-                  "Make it colorful, friendly and visually clear. " +
-                  "Avoid scary, violent or inappropriate content. " +
-                  "User request: " +
-                  message
-              }
-            ],
-
+            input: imagePrompt,
             response_format: {
               type: "image",
               mime_type: "image/png",
@@ -79,7 +90,9 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         type: "image",
-        answer: "Rasm tayyor bo'ldi.",
+        answer:
+          data?.output_text ||
+          "Rasm tayyor bo'ldi.",
         image: data?.output_image
           ? {
               mimeType:
@@ -91,17 +104,46 @@ export default async function handler(req, res) {
       });
     }
 
-    /*
-    ==================================================
-    BOLAJON AI — CHAT / RASM / PDF
-    ==================================================
-    */
+    /* =========================
+       2. CHAT / RASM / PDF
+    ========================= */
 
     const input = [];
 
     /*
-    RASM
+      Oldingi suhbatni Gemini'ga beramiz.
+      Bu Bolajon AI'ni oddiy bir martalik chatbot emas,
+      davomli suhbatga yaqin ishlashiga yordam beradi.
     */
+
+    if (Array.isArray(history) && history.length) {
+      const previousMessages = history
+        .slice(-12)
+        .map(item => {
+          const role =
+            item?.role === "assistant"
+              ? "Bolajon AI"
+              : "Bola";
+
+          return `${role}: ${String(
+            item?.content || ""
+          )}`;
+        })
+        .join("\n");
+
+      if (previousMessages) {
+        input.push({
+          type: "text",
+          text:
+            "Oldingi suhbat:\n" +
+            previousMessages
+        });
+      }
+    }
+
+    /* =========================
+       3. FAYL / RASM
+    ========================= */
 
     if (fileData && mimeType) {
       const allowedTypes = [
@@ -122,7 +164,7 @@ export default async function handler(req, res) {
 
       if (mimeType === "application/pdf") {
         input.push({
-          type: "file",
+          type: "document",
           mime_type: mimeType,
           data: fileData
         });
@@ -135,38 +177,51 @@ export default async function handler(req, res) {
       }
     }
 
-    /*
-    AI KO'RSATMASI
-    */
-
-    const prompt = `
-Sen Bolajon AI yordamchisisan.
-
-Javoblaring:
-- o'zbek tilida bo'lsin;
-- bolalarga tushunarli bo'lsin;
-- mehribon va qisqa bo'lsin;
-- ta'limiy bo'lsin;
-- bola xato qilsa, koyima;
-- kerak bo'lsa oddiy misol bilan tushuntir.
-
-Agar rasm yuborilgan bo'lsa:
-- rasmni tahlil qil;
-- undagi obyektlar, yozuvlar yoki topshiriqni tushuntir.
-
-Agar PDF yuborilgan bo'lsa:
-- uning mazmunini tahlil qil;
-- savollarga hujjat asosida javob ber;
-- kerak bo'lsa qisqacha mazmun yoki test tuz.
-
-Foydalanuvchi savoli:
-${message || "Yuborilgan faylni tushuntirib ber."}
-`;
+    /* =========================
+       4. BOLAJON AI QOIDALARI
+    ========================= */
 
     input.push({
       type: "text",
-      text: prompt
+      text: `
+Sen "Bolajon AI" yordamchisisan.
+
+Asosiy til:
+- o'zbek tili.
+
+Uslub:
+- mehribon;
+- sodda;
+- qisqa;
+- bolaga tushunarli;
+- ta'limiy;
+- rag'batlantiruvchi.
+
+Muhim:
+- Bola xato qilsa koyima.
+- "Sen bilmaysan" yoki shunga o'xshash salbiy gaplardan foydalanma.
+- Javobni imkon qadar sodda tushuntir.
+- Kerak bo'lsa misol ber.
+- Bolaga mos bo'lmagan kontentga yordam berma.
+
+Agar rasm yuborilgan bo'lsa:
+- rasmni tahlil qil;
+- undagi yozuv, obyekt yoki topshiriqni tushuntir.
+
+Agar PDF yuborilgan bo'lsa:
+- hujjat mazmunini tahlil qil;
+- savolga hujjat asosida javob ber;
+- kerak bo'lsa qisqacha mazmun qil;
+- kerak bo'lsa test yoki mashq tuz.
+
+Foydalanuvchi savoli:
+${message || "Yuborilgan materialni tushuntirib ber."}
+`
     });
+
+    /* =========================
+       5. GEMINI CHAT
+    ========================= */
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/interactions",
@@ -193,17 +248,23 @@ ${message || "Yuborilgan faylni tushuntirib ber."}
       });
     }
 
+    /* =========================
+       6. JAVOBNI OLISH
+    ========================= */
+
     let answer = "";
 
     if (data?.output_text) {
       answer = data.output_text;
-    } else if (Array.isArray(data?.steps)) {
+    }
+
+    if (!answer && Array.isArray(data?.steps)) {
       for (const step of data.steps) {
-        if (step?.type === "model_output") {
-          for (const item of step.content || []) {
-            if (item?.type === "text") {
-              answer += item.text || "";
-            }
+        if (step?.type !== "model_output") continue;
+
+        for (const item of step.content || []) {
+          if (item?.type === "text") {
+            answer += item.text || "";
           }
         }
       }
@@ -216,16 +277,18 @@ ${message || "Yuborilgan faylni tushuntirib ber."}
           : mimeType
           ? "image"
           : "chat",
+
       answer:
         answer.trim() ||
-        "Kechirasiz, hozir javob bera olmadim."
+        "Kechirasiz, hozircha javob bera olmadim."
     });
 
   } catch (error) {
     console.error("Bolajon AI:", error);
 
     return res.status(500).json({
-      error: "Bolajon AI serverida xatolik yuz berdi."
+      error:
+        "Bolajon AI serverida xatolik yuz berdi."
     });
   }
-}
+        }
