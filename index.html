@@ -9,6 +9,43 @@
   <link rel="apple-touch-icon" href="assets/pwa/icon-192.png">
   <link rel="stylesheet" href="style.css">
   <title>Bolajonlar</title>
+  .ai-tools{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+
+.ai-tool{
+  border:0;
+  border-radius:14px;
+  padding:10px 12px;
+  background:#f2edff;
+  color:#4b2d91;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.ai-tool:active{
+  transform:scale(.97);
+}
+
+.ai-file-preview{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:#f4f0ff;
+  font-size:13px;
+}
+
+.ai-file-preview img{
+  width:70px;
+  height:70px;
+  object-fit:cover;
+  border-radius:12px;
+  display:block;
+  margin-bottom:6px;
+}
   <style>
     .feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:14px;margin:18px 0 28px}
     .feature-card{border:0;border-radius:22px;padding:18px;text-align:left;background:#fff;box-shadow:0 8px 24px rgba(40,20,90,.10);cursor:pointer}
@@ -222,8 +259,38 @@
   <div class="ai-box">
     <div class="ai-message"><div class="feature-inline"><img src="assets/illustrations/ai/ai-spark.png" alt="AI" class="mini-visual"><b>Bolajon AI</b></div>Hozircha sinov rejimida ishlayman. Savolingizni yozing — men o'quvcha tarzda javob beraman.</div>
     <div id="aiMessages"></div>
-    <div class="ai-input"><input id="aiInput" placeholder="Masalan: A harfi haqida ayt"><button id="aiSend" class="primary">Yuborish</button></div>
-  </div>
+    <div class="ai-tools">
+  <input id="aiFileInput" type="file" accept="image/*,.pdf" hidden>
+
+  <button id="aiAttachBtn" class="ai-tool" type="button">
+    ➕
+  </button>
+
+  <button id="aiImageBtn" class="ai-tool" type="button">
+    📷 Rasm
+  </button>
+
+  <button id="aiPdfBtn" class="ai-tool" type="button">
+    📄 PDF
+  </button>
+
+  <button id="aiGenerateBtn" class="ai-tool" type="button">
+    🎨 Rasm yasash
+  </button>
+</div>
+
+<div id="aiFilePreview" class="ai-file-preview" hidden></div>
+
+<div class="ai-input">
+  <input
+    id="aiInput"
+    placeholder="Masalan: A harfi haqida ayt"
+    autocomplete="off"
+  >
+  <button id="aiSend" class="primary">
+    Yuborish
+  </button>
+</div>
 </section>
 </main>
 
