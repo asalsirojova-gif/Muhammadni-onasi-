@@ -254,43 +254,201 @@
 </section>
 
 <section id="ai" class="view feature-view">
-  <button class="back" data-v="home">← Bosh menyuga qaytish</button>
-  <div class="feature-head"><img class="big" src="assets/illustrations/ai/ai.png" alt="Bolajon AI"><div><p class="ey">YORDAMCHI</p><h1>Bolajon AI</h1><p>O'qishga yordam beruvchi aqlli yordamchi.</p></div></div>
+
+  <button class="back" data-v="home">
+    ← Bosh menyuga qaytish
+  </button>
+
+  <div class="feature-head">
+    <img
+      class="big"
+      src="assets/illustrations/ai/ai.png"
+      alt="Bolajon AI"
+    >
+
+    <div>
+      <p class="ey">YORDAMCHI</p>
+      <h1>Bolajon AI</h1>
+      <p>O'qish, rasm va topshiriqlarda yordam beraman.</p>
+    </div>
+  </div>
+
   <div class="ai-box">
-    <div class="ai-message"><div class="feature-inline"><img src="assets/illustrations/ai/ai-spark.png" alt="AI" class="mini-visual"><b>Bolajon AI</b></div>Hozircha sinov rejimida ishlayman. Savolingizni yozing — men o'quvcha tarzda javob beraman.</div>
-    <div id="aiMessages"></div>
-    <div class="ai-tools">
-  <input id="aiFileInput" type="file" accept="image/*,.pdf" hidden>
 
-  <button id="aiAttachBtn" class="ai-tool" type="button">
-    ➕
-  </button>
+    <!-- AI HEADER -->
+    <div class="ai-chat-head">
+      <div class="feature-inline">
+        <img
+          src="assets/illustrations/ai/ai-spark.png"
+          alt="AI"
+          class="mini-visual"
+        >
 
-  <button id="aiImageBtn" class="ai-tool" type="button">
-    📷 Rasm
-  </button>
+        <div>
+          <b>Bolajon AI</b>
+          <small>● Online yordamchi</small>
+        </div>
+      </div>
 
-  <button id="aiPdfBtn" class="ai-tool" type="button">
-    📄 PDF
-  </button>
+      <button
+        id="aiNewChat"
+        class="ai-new-chat"
+        type="button"
+      >
+        🆕
+      </button>
+    </div>
 
-  <button id="aiGenerateBtn" class="ai-tool" type="button">
-    🎨 Rasm yasash
-  </button>
-</div>
 
-<div id="aiFilePreview" class="ai-file-preview" hidden></div>
+    <!-- WELCOME -->
+    <div
+      id="aiWelcome"
+      class="ai-message ai-welcome"
+    >
+      <div class="feature-inline">
+        <img
+          src="assets/illustrations/ai/ai-spark.png"
+          alt="AI"
+          class="mini-visual"
+        >
 
-<div class="ai-input">
-  <input
-    id="aiInput"
-    placeholder="Masalan: A harfi haqida ayt"
-    autocomplete="off"
-  >
-  <button id="aiSend" class="primary">
-    Yuborish
-  </button>
-</div>
+        <div>
+          <b>Salom, Bolajon! 👋</b>
+          <p>
+            Men senga darslarda yordam beraman.
+            Savol ber, rasm yoki PDF yubor yoki
+            rasm yasashni so'ra.
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- CHAT -->
+    <div
+      id="aiMessages"
+      class="ai-messages"
+    ></div>
+
+
+    <!-- FILE INPUTS -->
+    <input
+      id="aiImageInput"
+      type="file"
+      accept="image/*"
+      hidden
+    >
+
+    <input
+      id="aiPdfInput"
+      type="file"
+      accept="application/pdf,.pdf"
+      hidden
+    >
+
+    <input
+      id="aiCameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      hidden
+    >
+
+
+    <!-- FILE PREVIEW -->
+    <div
+      id="aiFilePreview"
+      class="ai-file-preview"
+      hidden
+    ></div>
+
+
+    <!-- TOOL MENU -->
+    <div
+      id="aiToolsMenu"
+      class="ai-tools-menu"
+      hidden
+    >
+
+      <button
+        id="aiImageBtn"
+        class="ai-tool"
+        type="button"
+      >
+        📷 Rasm
+      </button>
+
+      <button
+        id="aiCameraBtn"
+        class="ai-tool"
+        type="button"
+      >
+        📸 Kamera
+      </button>
+
+      <button
+        id="aiPdfBtn"
+        class="ai-tool"
+        type="button"
+      >
+        📄 PDF
+      </button>
+
+      <button
+        id="aiGenerateBtn"
+        class="ai-tool"
+        type="button"
+      >
+        🎨 Rasm yasash
+      </button>
+
+    </div>
+
+
+    <!-- INPUT AREA -->
+    <div class="ai-input">
+
+      <button
+        id="aiAttachBtn"
+        class="ai-plus"
+        type="button"
+        aria-label="Qo'shimcha"
+      >
+        ＋
+      </button>
+
+      <input
+        id="aiInput"
+        type="text"
+        placeholder="Bolajon AI'dan so'rang..."
+        autocomplete="off"
+      >
+
+      <button
+        id="aiMicBtn"
+        class="ai-mic"
+        type="button"
+        aria-label="Ovoz"
+      >
+        🎤
+      </button>
+
+      <button
+        id="aiSend"
+        class="primary"
+        type="button"
+      >
+        ➤
+      </button>
+
+    </div>
+
+    <small class="ai-hint">
+      AI xato qilishi mumkin. Muhim ma'lumotlarni kattalar bilan tekshiring.
+    </small>
+
+  </div>
+
 </section>
 </main>
 
