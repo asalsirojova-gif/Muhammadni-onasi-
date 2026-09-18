@@ -308,48 +308,473 @@ $("#saveName").onclick=saveName;
 function initName(){const n=playerName();if(n){$("#playerName").value=n;$("#hello").textContent=`Salom, ${n}! O'ynab o'rganamiz! 🌟`;$("#quizWelcome").textContent=`${n}, 10 ta savolga javob bering va sovrinlarni yutib oling!`}}
 function installApp(){if(dp){dp.prompt();dp.userChoice.then(()=>{dp=null;$("#install").hidden=true})}else toast("Brauzer menyusidan 'Ilovani o'rnatish' ni tanlang")}
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;$("#install").hidden=false});$("#install").onclick=installApp;$("#installHome").onclick=installApp;
-/* ===================== BOLAJON AI (secure server + saved chat) ===================== */
-const AIKEY="bolajonAIHistory";
+/* ===================== BOLAJON AI ===================== */
+
+const AIKEY = "bolajonAIHistory";
+
 function aiHistory(){
-  try{const h=JSON.parse(localStorage.getItem(AIKEY)||"[]");return Array.isArray(h)?h:[]}catch(e){return []}
-}
-function saveAIHistory(h){localStorage.setItem(AIKEY,JSON.stringify(h.slice(-40)))}
-function renderAIHistory(){
-  const box=$("#aiMessages");if(!box)return;
-  const h=aiHistory();
-  box.innerHTML=h.map(m=>m.role==="user"
-    ?`<div class="ai-message"><b>Siz:</b> ${escapeHTML(m.content)}</div>`
-    :`<div class="ai-message"><div class="feature-inline"><img src="${APP_ICONS.ai.spark}" alt="AI" class="mini-visual"><b>Bolajon AI</b></div>${escapeHTML(m.content).replace(/\n/g,"<br>")}</div>`).join("");
-}
-function clearAIHistory(){
-  localStorage.removeItem(AIKEY);renderAIHistory();toast("Bolajon AI suhbatlari tozalandi");
-}
-function setAISending(on){
-  const b=$("#aiSend"),inp=$("#aiInput");if(b)b.disabled=on;if(inp)inp.disabled=on;if(b)b.textContent=on?"Yozmoqda...":"Yuborish";
-}
-async function sendAI(){
-  const inp=$("#aiInput"),q=inp.value.trim();if(!q)return;
-  const box=$("#aiMessages");
-  const h=aiHistory();
-  h.push({role:"user",content:q});saveAIHistory(h);renderAIHistory();inp.value="";setAISending(true);
   try{
-    const history=aiHistory().slice(-12);
-    const r=await fetch("/api/bolajon-ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q,history})});
-    const data=await r.json().catch(()=>({}));
-    if(!r.ok)throw new Error(data.error||"AI javob bera olmadi");
-    const answer=String(data.answer||"").trim()||"Hozircha javob bera olmadim. Yana bir bor urinib ko‘ring 😊";
-    const h2=aiHistory();h2.push({role:"assistant",content:answer});saveAIHistory(h2);renderAIHistory();
-    box?.lastElementChild?.scrollIntoView({behavior:"smooth",block:"nearest"});
+    const h = JSON.parse(localStorage.getItem(AIKEY) || "[]");
+    return Array.isArray(h) ? h : [];
   }catch(e){
-    const h2=aiHistory();if(h2.at(-1)?.role==="user"&&h2.at(-1)?.content===q)h2.pop();saveAIHistory(h2);renderAIHistory();
-    toast("AI bilan ulanishda xatolik. Internetni tekshiring.");
-  }finally{setAISending(false);inp.focus()}
+    return [];
+  }
 }
-function escapeHTML(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 
-$("#aiSend").onclick=sendAI;$("#aiInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendAI()}});
+function saveAIHistory(h){
+  localStorage.setItem(AIKEY, JSON.stringify(h.slice(-40)));
+}
+
+function renderAIHistory(){
+  const box = $("#aiMessages");
+  if(!box) return;
+
+  const h = aiHistory();
+
+  box.innerHTML = h.map(m => {
+    if(m.role === "assistant"){
+      return `
+        <div class="ai-message">
+          <div class="feature-inline">
+            <img src="${APP_ICONS.ai.spark}" alt="AI" class="mini-visual">
+            <b>Bolajon AI</b>
+          </div>
+          ${escapeHTML(m.content || "").replace(/\n/g,"<br>")}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="ai-message">
+        <b>Siz:</b> ${escapeHTML(m.content || "")}
+      </div>
+    `;
+  }).join("");
+}
+
+function clearAIHistory(){
+  localStorage.removeItem(AIKEY);
+  renderAIHistory();
+  toast("Bolajon AI suhbatlari tozalandi");
+}
+
+function setAISending(on){
+  const input = $("#aiInput");
+  const send = $("#aiSend");
+
+  if(input) input.disabled = on;
+  if(send){
+    send.disabled = on;
+    send.textContent = on ? "Yozmoqda..." : "Yuborish";
+  }
+
+  [
+    "#aiAttachBtn",
+    "#aiImageBtn",
+    "#aiPdfBtn",
+    "#aiGenerateBtn"
+  ].forEach(id => {
+    const btn = $(id);
+    if(btn) btn.disabled = on;
+  });
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g,m => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+
+/* ---------- Faylni base64 qilish ---------- */
+
+function fileToBase64(file){
+  return new Promise((resolve,reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      const base64 = result.includes(",")
+        ? result.split(",")[1]
+        : result;
+
+      resolve(base64);
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------- Fayl preview ---------- */
+
+function showAIFilePreview(file){
+  const preview = $("#aiFilePreview");
+  if(!preview) return;
+
+  preview.hidden = false;
+
+  if(file.type.startsWith("image/")){
+    const url = URL.createObjectURL(file);
+
+    preview.innerHTML = `
+      <img src="${url}" alt="Tanlangan rasm">
+      <b>${escapeHTML(file.name)}</b>
+    `;
+  }else{
+    preview.innerHTML = `
+      📄 <b>${escapeHTML(file.name)}</b>
+    `;
+  }
+}
+
+/* ---------- Rasm/PDF yuborish ---------- */
+
+let selectedAIFile = null;
+
+async function sendAIFile(){
+  const input = $("#aiInput");
+  const file = selectedAIFile;
+
+  if(!file){
+    toast("Avval rasm yoki PDF tanlang");
+    return;
+  }
+
+  const question =
+    input.value.trim() ||
+    "Yuborgan materialimni tushuntirib ber.";
+
+  setAISending(true);
+
+  const h = aiHistory();
+
+  h.push({
+    role:"user",
+    content:`${file.type === "application/pdf" ? "📄 PDF" : "🖼️ Rasm"}: ${file.name}\n${question}`
+  });
+
+  saveAIHistory(h);
+  renderAIHistory();
+
+  try{
+    const fileData = await fileToBase64(file);
+
+    const response = await fetch("/api/bolajon-ai",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        action:"chat",
+        message:question,
+        history:aiHistory().slice(-12),
+        fileData:fileData,
+        mimeType:file.type
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if(!response.ok){
+      throw new Error(data.error || "AI javob bera olmadi");
+    }
+
+    const answer =
+      String(data.answer || "").trim() ||
+      "Hozircha javob bera olmadim. Yana urinib ko‘ring 😊";
+
+    const h2 = aiHistory();
+
+    h2.push({
+      role:"assistant",
+      content:answer
+    });
+
+    saveAIHistory(h2);
+    renderAIHistory();
+
+    input.value = "";
+    selectedAIFile = null;
+
+    const preview = $("#aiFilePreview");
+    if(preview){
+      preview.hidden = true;
+      preview.innerHTML = "";
+    }
+
+  }catch(error){
+    toast("AI bilan ulanishda xatolik. Internetni tekshiring.");
+  }finally{
+    setAISending(false);
+    input?.focus();
+  }
+}
+
+/* ---------- Oddiy matn yuborish ---------- */
+
+async function sendAI(){
+  const input = $("#aiInput");
+  const q = input.value.trim();
+
+  if(!q && !selectedAIFile) return;
+
+  if(selectedAIFile){
+    await sendAIFile();
+    return;
+  }
+
+  const box = $("#aiMessages");
+
+  const h = aiHistory();
+
+  h.push({
+    role:"user",
+    content:q
+  });
+
+  saveAIHistory(h);
+  renderAIHistory();
+
+  input.value = "";
+  setAISending(true);
+
+  try{
+    const response = await fetch("/api/bolajon-ai",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        action:"chat",
+        message:q,
+        history:aiHistory().slice(-12)
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if(!response.ok){
+      throw new Error(data.error || "AI javob bera olmadi");
+    }
+
+    const answer =
+      String(data.answer || "").trim() ||
+      "Hozircha javob bera olmadim. Yana bir bor urinib ko‘ring 😊";
+
+    const h2 = aiHistory();
+
+    h2.push({
+      role:"assistant",
+      content:answer
+    });
+
+    saveAIHistory(h2);
+    renderAIHistory();
+
+    box?.lastElementChild?.scrollIntoView({
+      behavior:"smooth",
+      block:"nearest"
+    });
+
+  }catch(error){
+    const h2 = aiHistory();
+
+    if(
+      h2.at(-1)?.role === "user" &&
+      h2.at(-1)?.content === q
+    ){
+      h2.pop();
+    }
+
+    saveAIHistory(h2);
+    renderAIHistory();
+
+    toast("AI bilan ulanishda xatolik. Internetni tekshiring.");
+
+  }finally{
+    setAISending(false);
+    input.focus();
+  }
+}
+
+/* ---------- Rasm tanlash ---------- */
+
+function chooseAIImage(){
+  const fileInput = $("#aiFileInput");
+  if(!fileInput) return;
+
+  fileInput.accept = "image/*";
+  fileInput.click();
+}
+
+/* ---------- PDF tanlash ---------- */
+
+function chooseAIPDF(){
+  const fileInput = $("#aiFileInput");
+  if(!fileInput) return;
+
+  fileInput.accept = ".pdf,application/pdf";
+  fileInput.click();
+}
+
+/* ---------- Tanlangan fayl ---------- */
+
+$("#aiFileInput")?.addEventListener("change", e => {
+  const file = e.target.files?.[0];
+
+  if(!file) return;
+
+  const isImage = file.type.startsWith("image/");
+  const isPDF = file.type === "application/pdf";
+
+  if(!isImage && !isPDF){
+    toast("Faqat rasm yoki PDF tanlang");
+    e.target.value = "";
+    return;
+  }
+
+  selectedAIFile = file;
+  showAIFilePreview(file);
+
+  const input = $("#aiInput");
+
+  if(input && !input.value.trim()){
+    input.placeholder =
+      isPDF
+      ? "PDF haqida savolingizni yozing..."
+      : "Rasm haqida savolingizni yozing...";
+  }
+});
+
+/* ---------- Tugmalar ---------- */
+
+$("#aiAttachBtn")?.addEventListener("click",() => {
+  $("#aiFileInput")?.click();
+});
+
+$("#aiImageBtn")?.addEventListener("click",chooseAIImage);
+
+$("#aiPdfBtn")?.addEventListener("click",chooseAIPDF);
+
+/* ---------- Rasm yasash ---------- */
+
+async function generateAIImage(){
+
+  const input = $("#aiInput");
+  const prompt = input.value.trim();
+
+  if(!prompt){
+    toast("Avval qanday rasm kerakligini yozing");
+    input.focus();
+    return;
+  }
+
+  setAISending(true);
+
+  try{
+
+    const response = await fetch("/api/bolajon-ai",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        action:"image",
+        message:prompt
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if(!response.ok){
+      throw new Error(data.error || "Rasm yaratib bo‘lmadi");
+    }
+
+    const box = $("#aiMessages");
+
+    if(data.image?.data){
+
+      const imageSrc =
+        `data:${data.image.mimeType || "image/png"};base64,${data.image.data}`;
+
+      box.insertAdjacentHTML("beforeend",`
+        <div class="ai-message">
+          <div class="feature-inline">
+            <img src="${APP_ICONS.ai.spark}" alt="AI" class="mini-visual">
+            <b>Bolajon AI</b>
+          </div>
+
+          <p>🎨 Rasm tayyor bo‘ldi!</p>
+
+          <img
+            src="${imageSrc}"
+            alt="Bolajon AI yaratgan rasm"
+            style="width:100%;max-width:420px;border-radius:18px;display:block;margin-top:10px;"
+          >
+        </div>
+      `);
+
+    }else{
+
+      const answer =
+        String(data.answer || "Rasm tayyor bo‘ldi.").trim();
+
+      box.insertAdjacentHTML("beforeend",`
+        <div class="ai-message">
+          <div class="feature-inline">
+            <img src="${APP_ICONS.ai.spark}" alt="AI" class="mini-visual">
+            <b>Bolajon AI</b>
+          </div>
+          ${escapeHTML(answer).replace(/\n/g,"<br>")}
+        </div>
+      `);
+    }
+
+    input.value = "";
+
+    box?.lastElementChild?.scrollIntoView({
+      behavior:"smooth",
+      block:"nearest"
+    });
+
+  }catch(error){
+
+    toast("Rasm yaratishda xatolik yuz berdi.");
+
+  }finally{
+
+    setAISending(false);
+    input.focus();
+  }
+}
+
+$("#aiGenerateBtn")?.addEventListener(
+  "click",
+  generateAIImage
+);
+
+/* ---------- Yuborish ---------- */
+
+$("#aiSend")?.addEventListener(
+  "click",
+  sendAI
+);
+
+$("#aiInput")?.addEventListener(
+  "keydown",
+  e => {
+    if(e.key === "Enter" && !e.shiftKey){
+      e.preventDefault();
+      sendAI();
+    }
+  }
+);
+
 renderAIHistory();
-
 /* ===================== PWA: install / offline / update ===================== */
 function showUpdateBtn(reg){
   const b=$("#updateApp");if(!b)return;
